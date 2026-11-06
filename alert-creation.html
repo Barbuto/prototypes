@@ -11469,7 +11469,7 @@ Object.assign(window, { DesktopView });
 function MobileStatusbar() {
   return /* @__PURE__ */ React.createElement("div", { className: "device-statusbar" }, /* @__PURE__ */ React.createElement("span", null, "9:41"), /* @__PURE__ */ React.createElement("span", { className: "icons" }, /* @__PURE__ */ React.createElement("span", { style: { width: 16, height: 10, position: "relative" } }, [2, 5, 8, 11].map(
     (h, i) => /* @__PURE__ */ React.createElement("span", { key: i, style: { position: "absolute", bottom: 0, left: i * 4, width: 3, height: h, background: "#000", borderRadius: 0.5 } })
-  )), /* @__PURE__ */ React.createElement("span", { style: { width: 14, height: 10, fontSize: 10 } }, "\u{1F4F6}"), /* @__PURE__ */ React.createElement("span", { style: { width: 22, height: 10, border: "1.2px solid #000", borderRadius: 2, position: "relative" } }, /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", inset: 1, background: "#000" } }))));
+  )), /* @__PURE__ */ React.createElement("span", { style: { width: 22, height: 10, border: "1.2px solid #000", borderRadius: 2, position: "relative" } }, /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", inset: 1, background: "#000" } }))));
 }
 function MobileView({ storesFilters, setStoresFilters, feedFilters, setFeedFilters, selectedStore, openStore, goBack, selectedAlert, setSelectedAlert, goToPlatform, userType }) {
   var _a, _b, _c;
@@ -11848,7 +11848,7 @@ function formParts(typeId, issue) {
     add("photos", "Alert Photos");
   } else {
     addVendor();
-    if (fd && typeId === "need") add("sizes", "How much is left in the store?");
+    if (fd && (typeId === "need" || isLarge && typeId === "svc" && issue === "Out of Stock")) add("sizes", "How much is left in the store?");
     if (spec.invoiceNumber) add("invoiceNumber", "Invoice number");
     if (spec.oosCounts) add("counts", "Ad item counter");
     if (spec.oosLocations) add("locations", "Location of items");
@@ -12213,7 +12213,8 @@ function AlertCreationForm({ open, typeId, issue, onBack, onSubmit, onToast }) {
   const manufacturerOk = !smallManufacturer || !on("category") || v.manufacturer;
   const itemField = itemFlow && v.category ? /* @__PURE__ */ React.createElement(FormSelect, { placeholder: "Select an Item", value: v.item, onClick: () => setPicker("item") }) : null;
   const itemOk = !itemFlow || v.item;
-  const fdSizes = itemFlow && typeId === "need" && v.item && on("sizes") ? fdSizesFor(v.category) : null;
+  const sizesIssue = typeId === "need" || isLarge && typeId === "svc" && issue === "Out of Stock";
+  const fdSizes = itemFlow && sizesIssue && v.item && on("sizes") ? fdSizesFor(v.category) : null;
   const sizesBlock = fdSizes ? /* @__PURE__ */ React.createElement("div", { className: "gwc-form__section gwc-form__section--sizes" }, /* @__PURE__ */ React.createElement("div", { className: "gwc-form__label" }, "How much is left in the store?"), /* @__PURE__ */ React.createElement("div", { className: "gwc-form__sublabel" }, "Choose one for each size you carry."), /* @__PURE__ */ React.createElement("div", { className: "gwc-sizes" }, fdSizes.map(
     (size) => /* @__PURE__ */ React.createElement("div", { className: "gwc-sizes__row", key: size }, /* @__PURE__ */ React.createElement("div", { className: "gwc-sizes__label" }, size), /* @__PURE__ */ React.createElement("div", { className: "gwc-seg", role: "radiogroup", "aria-label": size }, ["None", "Some"].map(
       (opt) => /* @__PURE__ */ React.createElement(
