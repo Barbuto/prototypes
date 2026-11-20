@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tactiq Insights — Prototype</title>
+<meta name="description" content="Interactive prototype of Tactiq Insights: CSI dashboard, Tessa AI assistant, alerts and user management.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fff}
+a{color:#00866A}a:hover{color:#006B55}
+*{box-sizing:border-box}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid #00B289;outline-offset:2px}
+.nav{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:0 16px;border:0;border-radius:8px;background:transparent;font-size:16px;font-weight:500;text-align:left;transition:background .15s}
+.nav:hover{background:#18403F}
+.nav.sub{font-weight:400;min-height:40px}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#0F172A;font-size:14px;font-weight:600;transition:background .15s}
+.ghost:hover{background:#F1F5F9}
+.icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:0;border-radius:8px;background:transparent;color:#64748B;transition:background .15s,color .15s}
+.icon:hover{background:#F1F5F9;color:#0F172A}
+.icon:has(input:focus-visible){outline:2px solid #00B289;outline-offset:2px}
+.primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border:0;border-radius:8px;background:#00866A;color:#fff;font-size:14px;font-weight:600;transition:background .15s}
+.primary:hover{background:#006B55}
+.outline{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;color:#0F172A;font-size:14px;font-weight:600}
+.outline:hover{background:#F8FAFC}
+.field{height:40px;width:100%;padding:0 12px;border:1px solid #E2E8F0;border-radius:8px;background:#fff;font-size:15px}
+.field:focus{outline:none;border-color:#00866A;box-shadow:0 0 0 3px rgba(0,178,137,.18)}
+.tab{min-height:32px;padding:0 14px;border:0;border-radius:6px;font-size:14px;font-weight:600;transition:background .15s,color .15s}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.row:hover td{background:#F8FAFC}
+td,th{padding:12px 16px;text-align:left;border-bottom:1px solid #E2E8F0;font-size:15px;vertical-align:middle}
+th{font-size:13px;font-weight:600;color:#64748B;background:#fff}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.switch{position:relative;width:40px;height:24px;padding:0;border:0;border-radius:999px;transition:background .2s}
+.switch span{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+.menu{position:absolute;right:0;top:40px;z-index:30;min-width:150px;padding:4px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;box-shadow:0 10px 30px rgba(15,23,42,.12)}
+.menu button{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:0 10px;border:0;border-radius:6px;background:transparent;font-size:14px;text-align:left}
+.menu button:hover{background:#F1F5F9}
+.grp .tip{opacity:0;transition:opacity .15s}
+.grp:hover .tip{opacity:1}
+.grp:hover .bar{filter:brightness(1.08)}
+.sugg{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:#64748B;font-size:16px;text-align:left;transition:background .15s,color .15s}
+.sugg:hover{background:#F8FAFC;color:#0F172A}
+.qa{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px;border:1px solid #E2E8F0;border-radius:10px;background:#fff;text-align:left;transition:border-color .15s,background .15s}
+.qa:hover{border-color:#00B289;background:#F6FDFB}
+.hist{display:flex;align-items:flex-start;gap:12px;padding:10px 8px 10px 12px;border-radius:8px}
+.hist:hover{background:#F1F5F9}
+.hist .del{opacity:0}
+.hist:hover .del,.hist .del:focus-visible{opacity:1}
+.histopen{flex:1;min-width:0;padding:0;border:0;background:transparent;text-align:left}
+.composer{transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:#00866A !important;box-shadow:0 0 0 3px rgba(0,178,137,.14) !important}
+.ta{display:block;width:100%;min-height:44px;max-height:160px;border:0;padding:0;background:transparent;font-size:16px;line-height:1.5;resize:none;outline:none}
+.ta::placeholder{color:#64748B}
+.mitem{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:8px 10px;border:0;border-radius:6px;background:transparent;text-align:left}
+.mitem:hover{background:#F1F5F9}
+.chipx{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;border:0;border-radius:4px;background:transparent;color:inherit}
+.chipx:hover{background:rgba(0,0,0,.08)}
+.legend{display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:4px 8px;border:0;border-radius:6px;background:transparent;font-size:14px;text-align:left}
+.legend:hover{background:#F1F5F9}
+.fab{transition:transform .15s,box-shadow .15s}
+.fab:hover{transform:scale(1.05);box-shadow:0 12px 28px rgba(0,0,0,.28)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dot{width:5px;height:5px;border-radius:50%;background:#00866A;animation:blink 1.2s infinite}
+.caret{display:inline-block;width:8px;height:18px;margin-left:2px;vertical-align:-3px;background:#00B289;animation:blink 1s infinite}
+.in{animation:rise .25s ease-out}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* Minimal renderer for the prototype: {{holes}}, <sc-if>, <sc-for>, on* events, DOM morphing. */
+(function () {
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var HTML_NS = 'http://www.w3.org/1999/xhtml';
+
+  window.DCLogic = function DCLogic(props) { this.props = props || {}; this.state = {}; };
+  DCLogic.prototype.setState = function (u) {
+    var patch = typeof u === 'function' ? u(this.state, this.props) : u;
+    if (patch) this.state = Object.assign({}, this.state, patch);
+    schedule();
+  };
+  DCLogic.prototype.forceUpdate = function () { schedule(); };
+
+  var tpl, comp, mount, queued = false;
+
+  function schedule() {
+    if (queued || !comp) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; render(); });
+  }
+
+  function lookup(path, scope) {
+    path = path.trim();
+    if (path === 'true') return true;
+    if (path === 'false') return false;
+    if (path === 'null') return null;
+    if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+    var parts = path.split('.'), v = scope;
+    for (var i = 0; i < parts.length; i++) { if (v == null) return undefined; v = v[parts[i]]; }
+    return v;
+  }
+
+  var WHOLE = /^\{\{\s*([^}]+?)\s*\}\}$/;
+  function interp(str, scope) {
+    return str.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function (_, p) { var v = lookup(p, scope); return v == null ? '' : String(v); });
+  }
+
+  function eventType(el, name) {
+    var t = name.slice(2).toLowerCase();
+    if (t === 'change') {
+      var tag = el.localName, type = (el.getAttribute('type') || '').toLowerCase();
+      if (tag === 'textarea' || (tag === 'input' && ['checkbox', 'radio', 'file'].indexOf(type) < 0)) return 'input';
+    }
+    return t;
+  }
+
+  function bind(el, type) {
+    el.__bound = el.__bound || {};
+    if (el.__bound[type]) return;
+    el.__bound[type] = true;
+    el.addEventListener(type, function (e) { var h = el.__on && el.__on[type]; if (h) h(e); });
+  }
+
+  function build(node, scope, inSvg, out) {
+    if (node.nodeType === 3) { out.push(document.createTextNode(interp(node.nodeValue, scope))); return; }
+    if (node.nodeType !== 1) return;
+    var tag = node.localName;
+    if (tag === 'helmet') return;
+    if (tag === 'sc-if') {
+      if (lookup(WHOLE.exec(node.getAttribute('value'))[1], scope)) kids(node, scope, inSvg, out);
+      return;
+    }
+    if (tag === 'sc-for') {
+      var list = lookup(WHOLE.exec(node.getAttribute('list'))[1], scope) || [];
+      var as = node.getAttribute('as') || 'item';
+      list.forEach(function (item, i) {
+        var s = Object.create(scope); s[as] = item; s.$index = i;
+        kids(node, s, inSvg, out);
+      });
+      return;
+    }
+    var svg = inSvg || tag === 'svg';
+    var el = svg ? document.createElementNS(SVG_NS, tag) : document.createElement(tag);
+    var props = {};
+    el.__on = {};
+    for (var i = 0; i < node.attributes.length; i++) {
+      var a = node.attributes[i], name = a.name, raw = a.value;
+      if (name.indexOf('hint-') === 0 || name === 'xmlns') continue;
+      var m = WHOLE.exec(raw);
+      if (/^on[A-Z]/.test(name)) {
+        var fn = m ? lookup(m[1], scope) : null;
+        if (typeof fn === 'function') { var t = eventType(node, name); el.__on[t] = fn; bind(el, t); }
+        continue;
+      }
+      var val = m ? lookup(m[1], scope) : interp(raw, scope);
+      if (name === 'value' || name === 'checked') { props[name] = val; continue; }
+      if (val === false || val == null) continue;
+      el.setAttribute(name, val === true ? '' : String(val));
+    }
+    var children = [];
+    kids(node, scope, svg, children);
+    children.forEach(function (c) { el.appendChild(c); });
+    el.__props = props;
+    applyProps(el, props);
+    out.push(el);
+  }
+
+  function kids(node, scope, inSvg, out) {
+    for (var c = node.firstChild; c; c = c.nextSibling) build(c, scope, inSvg, out);
+  }
+
+  function applyProps(el, props) {
+    if ('value' in props) { var v = props.value == null ? '' : String(props.value); if (el.value !== v) el.value = v; }
+    if ('checked' in props) { var c = !!props.checked; if (el.checked !== c) el.checked = c; }
+  }
+
+  function same(a, b) {
+    if (a.nodeType !== b.nodeType) return false;
+    if (a.nodeType === 3) return true;
+    return a.localName === b.localName && a.namespaceURI === b.namespaceURI &&
+      (a.getAttribute('id') || '') === (b.getAttribute('id') || '') &&
+      (a.getAttribute('type') || '') === (b.getAttribute('type') || '');
+  }
+
+  function morph(live, next) {
+    if (live.nodeType === 3) { if (live.nodeValue !== next.nodeValue) live.nodeValue = next.nodeValue; return; }
+    var i, a;
+    for (i = live.attributes.length - 1; i >= 0; i--) { a = live.attributes[i]; if (!next.hasAttribute(a.name)) live.removeAttribute(a.name); }
+    for (i = 0; i < next.attributes.length; i++) { a = next.attributes[i]; if (live.getAttribute(a.name) !== a.value) live.setAttribute(a.name, a.value); }
+    live.__on = next.__on;
+    Object.keys(next.__on || {}).forEach(function (t) { bind(live, t); });
+    morphChildren(live, next);
+    applyProps(live, next.__props || {});
+  }
+
+  function morphChildren(live, next) {
+    var a = Array.prototype.slice.call(live.childNodes), b = Array.prototype.slice.call(next.childNodes);
+    for (var i = 0; i < b.length; i++) {
+      if (i >= a.length) live.appendChild(b[i]);
+      else if (same(a[i], b[i])) morph(a[i], b[i]);
+      else live.replaceChild(b[i], a[i]);
+    }
+    for (var j = b.length; j < a.length; j++) live.removeChild(a[j]);
+  }
+
+  function render() {
+    var active = document.activeElement, focusId = active && active.id, sel = null;
+    if (focusId && 'selectionStart' in active) { try { sel = [active.selectionStart, active.selectionEnd]; } catch (e) { sel = null; } }
+    var nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+    var boxes = Array.prototype.map.call(document.querySelectorAll('[data-autoscroll]'), function (el) {
+      return { id: el.getAttribute('data-autoscroll'), stick: el.scrollTop + el.clientHeight >= el.scrollHeight - 60 };
+    });
+
+    var vals = comp.renderVals();
+    var out = [];
+    kids(tpl, vals, false, out);
+    var holder = document.createElement('div');
+    out.forEach(function (n) { holder.appendChild(n); });
+    morphChildren(mount, holder);
+
+    if (focusId && document.activeElement !== document.getElementById(focusId)) {
+      var el = document.getElementById(focusId);
+      if (el && document.body.contains(el)) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch (e) {} }
+    }
+    boxes.forEach(function (b) {
+      var el = document.querySelector('[data-autoscroll="' + b.id + '"]');
+      if (el && b.stick) el.scrollTop = el.scrollHeight;
+    });
+    if (vals.autoScrollPage && nearBottom) window.scrollTo(0, document.documentElement.scrollHeight);
+  }
+
+  window.__dcStart = function (markup, Component) {
+    var doc = new DOMParser().parseFromString('<root>' + markup + '</root>', 'application/xml');
+    var err = doc.getElementsByTagName('parsererror')[0];
+    if (err) { document.body.textContent = 'Template error: ' + err.textContent; return; }
+    tpl = doc.documentElement;
+    mount = document.getElementById('app');
+    comp = new Component({});
+    render();
+    if (comp.componentDidMount) comp.componentDidMount();
+  };
+})();
+
+</script>
+<script>
+
+const MONTHS = [
+  ['Jan', 45000, 12.5, 28000], ['Feb', 52000, 15.6, 32000], ['Mar', 48000, -7.7, 30000],
+  ['Apr', 58000, 20.8, 35000], ['May', 62000, 6.9, 38000], ['Jun', 55000, -11.3, 34000],
+  ['Jul', 67000, 21.8, 41000], ['Aug', 71000, 6.0, 43000], ['Sep', 78000, 9.9, 47000],
+  ['Oct', 82000, 5.1, 49000], ['Nov', 89000, 8.5, 52000], ['Dec', 95000, 6.7, 55000]
+].map(function (r) { return { month: r[0], value: r[1], growth: r[2], expense: r[3] }; });
+
+const CATEGORIES = [
+  ['Carbonated Soft Drinks', 89], ['Energy Drinks', 76], ['Zero Sugar Variants', 73],
+  ['Water & Enhanced Water', 71], ['Tea & Coffee RTD', 67], ['Sports Drinks', 62],
+  ['Juices & Nectars', 58], ['Plant-Based Beverages', 52], ['Functional Drinks', 45], ['Premium Mixers', 39]
+];
+
+const STATES = [
+  ['California', 'CA', 890], ['New York', 'NY', 720], ['Texas', 'TX', 650], ['Florida', 'FL', 480],
+  ['Illinois', 'IL', 420], ['Colorado', 'CO', 350], ['Washington', 'WA', 310], ['Nevada', 'NV', 280]
+];
+const DONUT = ['#0284C7', '#F97316', '#10B981', '#66CCFF', '#00B289', '#D966FF', '#FF3377', '#FFD033'];
+
+const KPIS = [
+  { title: 'Total Retailers', value: '28' },
+  { title: 'Total Stores', value: '47,520' },
+  { title: 'Active Stores', value: '93.4%' },
+  { title: 'Total Analytics Users', value: '653' },
+  { title: 'Active Analytics Users', value: '38.6%' }
+];
+
+const MENTIONS = [
+  ['Dashboard', 'Main Dashboard', 'Overview of all metrics and charts'],
+  ['Dashboard', 'Alerts Dashboard', 'System alerts and notifications'],
+  ['Chart', 'Monthly Growth Chart', 'Monthly revenue and expense progression'],
+  ['Chart', 'Metric Cards', 'Key performance indicators overview'],
+  ['Chart', 'Alerts List', 'Current system alerts and issues'],
+  ['Metric', 'Total Retailers', 'Current number of retailers (28)'],
+  ['Metric', 'Total Stores', 'Total store count (47,520)'],
+  ['Metric', 'Active Stores', 'Percentage of active stores (93.4%)'],
+  ['Metric', 'Analytics Users', 'Total analytics users (653)'],
+  ['Metric', 'Active Analytics Users', 'Active analytics users percentage (38.6%)'],
+  ['Data Source', 'Revenue Data', 'Monthly revenue and growth metrics'],
+  ['Data Source', 'User Analytics', 'User engagement and activity data'],
+  ['Data Source', 'System Alerts', 'Real-time system monitoring data'],
+  ['Time Period', 'Current Month', 'December data'],
+  ['Time Period', 'Previous Month', 'November data'],
+  ['Time Period', 'Year to Date', 'Cumulative data'],
+  ['Time Period', 'Last Quarter', 'Q4 data']
+].map(function (r, i) { return { id: 'mn' + i, category: r[0], name: r[1], description: r[2] }; });
+
+const SEED_ALERTS = [
+  { id: 1, name: 'Low Stock Alert', trigger: 'Inventory < 100 units', severity: 'High', status: 'Active' },
+  { id: 2, name: 'Sales Decline', trigger: 'Weekly sales drop > 15%', severity: 'Medium', status: 'Active' },
+  { id: 3, name: 'System Downtime', trigger: 'API response time > 5s', severity: 'Critical', status: 'Inactive' },
+  { id: 4, name: 'Customer Complaints', trigger: 'Complaints > 5 per day', severity: 'Low', status: 'Active' }
+];
+
+const SEED_USERS = [
+  { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', platform: 'GlobalWorx', status: 'Active' },
+  { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', platform: 'Acuity', status: 'Active' },
+  { id: 3, firstName: 'Mike', lastName: 'Johnson', email: 'mike.johnson@example.com', platform: 'Insights', status: 'Inactive' },
+  { id: 4, firstName: 'Sarah', lastName: 'Wilson', email: 'sarah.wilson@example.com', platform: 'GlobalWorx', status: 'Pending' },
+  { id: 5, firstName: 'David', lastName: 'Brown', email: 'david.brown@example.com', platform: 'Acuity', status: 'Active' }
+];
+
+const SEED_HISTORY = [
+  { id: 'h1', title: 'Monthly Sales Research', ago: 'Just now', prompt: 'Analyze monthly sales performance' },
+  { id: 'h2', title: 'Store 1001 Trends', ago: '45m ago', prompt: 'Show store trends across the network' },
+  { id: 'h3', title: 'Potential OOS Next Week', ago: '1d ago', prompt: 'Which items are at risk of being out of stock next week?' },
+  { id: 'h4', title: 'Impacts of Hurricane Milton', ago: '1w ago', prompt: 'What were the impacts of Hurricane Milton on sales?' },
+  { id: 'h5', title: 'Next Steps with Retailer', ago: '1mo ago', prompt: 'Summarize retailer performance and next steps' },
+  { id: 'h6', title: 'Trend Analysis for Vendor Name', ago: '1mo ago', prompt: 'Run a trend analysis by product category' }
+];
+
+const PAGE_NAMES = { dashboard: 'the CSI Dashboard', alerts: 'Alerts', users: 'Users', tessa: 'Tessa' };
+
+function k$(n) { return '$' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K'; }
+function usd(n) { return '$' + n.toLocaleString('en-US'); }
+
+function chatName(message) {
+  const cleaned = message.trim().toLowerCase();
+  const cap = function (w) { return w.charAt(0).toUpperCase() + w.slice(1); };
+  if (cleaned.length < 20) return message.trim().split(/\s+/).map(cap).join(' ');
+  const stop = ['the','a','an','and','or','but','in','on','at','to','for','of','with','by','how','what','when','where','why','can','could','would','should','will','is','are','was','were','be','been','have','has','had','do','does','did','i','you','we','they','me','us','them','my','your','our','their','me','show','give'];
+  const words = cleaned.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(function (w) { return w.length > 2 && stop.indexOf(w) < 0; }).slice(0, 4);
+  if (!words.length) return 'New Chat';
+  const name = words.map(cap).join(' ');
+  return name.length > 30 ? name.slice(0, 27) + '...' : name;
+}
+
+function suggestionsFor(input) {
+  const t = input.trim();
+  if (!t) return ['Analyze sales performance for this quarter', 'Show delivery efficiency metrics', 'Review inventory levels and trends'];
+  if (t.length > 100) return [];
+  const l = t.toLowerCase();
+  if (l.indexOf('sales') > -1 || l.indexOf('revenue') > -1) return [t + ' with year-over-year comparison', t + ' by product category', t + ' and identify top performers'];
+  if (l.indexOf('delivery') > -1 || l.indexOf('route') > -1) return [t + ' and optimization opportunities', t + ' with cost analysis', t + ' by geographic region'];
+  if (l.indexOf('inventory') > -1 || l.indexOf('stock') > -1) return [t + ' and reorder recommendations', t + ' with turnover analysis', t + ' by warehouse location'];
+  return [t + ' with detailed breakdown', t + ' and actionable insights', t + ' including trends analysis'];
+}
+
+// ---- Tessa's scripted answers (blocks: h = heading, p = paragraph, li = bullet with bold lead) ----
+const H = function (t) { return { kind: 'h', lead: '', text: t }; };
+const P = function (t) { return { kind: 'p', lead: '', text: t }; };
+const L = function (lead, t) { return { kind: 'li', lead: lead, text: t }; };
+
+const R_REVENUE = [
+  H('Revenue snapshot, Jan–Dec'),
+  P('Revenue more than doubled over the year, from $45K in January to $95K in December.'),
+  L('Total revenue: ', '$802K against $484K in expenses.'),
+  L('Net profit: ', '$318K, about $26.5K a month on average.'),
+  L('Best month: ', 'December, with $40K in profit.'),
+  L('Soft spots: ', 'March (−7.7%) and June (−11.3%) were the only months revenue dipped. Both recovered the following month.'),
+  P('Want me to break this down by category or by state?')
+];
+const R_STATES = [
+  H('Revenue by state'),
+  P('Eight states account for $4.1M in revenue, and the top three carry most of it.'),
+  L('California: ', '$890K (21.7%), the clear leader.'),
+  L('New York: ', '$720K (17.6%).'),
+  L('Texas: ', '$650K (15.9%).'),
+  L('Long tail: ', 'Florida, Illinois, Colorado, Washington and Nevada range from $280K to $480K.'),
+  P('CA, NY and TX together make up 55% of revenue, so a dip in any one of them moves the whole number.')
+];
+const R_CATEGORIES = [
+  H('Category performance'),
+  L('Leaders: ', 'Carbonated Soft Drinks (89%), Energy Drinks (76%) and Zero Sugar Variants (73%).'),
+  L('Middle of the pack: ', 'Water & Enhanced Water (71%), Tea & Coffee RTD (67%) and Sports Drinks (62%).'),
+  L('Trailing: ', 'Premium Mixers (39%) and Functional Drinks (45%).'),
+  P('Zero Sugar is the one to watch: it scores nearly as high as the established leaders.')
+];
+const R_DELIVERY = [
+  P('I don’t have delivery or route data connected in this workspace yet, so I can’t report on delivery efficiency.'),
+  P('Right now I can see revenue and expenses by month, revenue by state, category performance, store and user KPIs, and your alert rules. Want a look at any of those instead?')
+];
+const R_WEATHER = [
+  P('I don’t have weather or event data connected, so I can’t isolate the effect of a specific storm.'),
+  P('I can show which months and states dipped, which is usually the first place an event like that shows up. June was the weakest month (−11.3%), and Florida contributes $480K of state revenue.')
+];
+const R_HELP = [
+  P('Here’s what I can help with on the CSI Dashboard:'),
+  L('Revenue: ', 'monthly revenue, expenses, profit and growth.'),
+  L('Geography: ', 'revenue by state.'),
+  L('Categories: ', 'which beverage categories are leading or lagging.'),
+  L('Operations: ', 'store counts, analytics adoption, and your alert rules.'),
+  P('Try typing @ to point me at a specific chart or metric.')
+];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.timers = {};
+    this.uid = 100;
+    this.state = {
+      page: 'dashboard',
+      sidebarOpen: true, dashOpen: true, maintOpen: true,
+      historyOpen: false,
+      fabOpen: false, fabView: 'home',
+      history: SEED_HISTORY.slice(),
+      conv: { main: this.blankConv(), fab: this.blankConv() },
+      donutPick: null,
+      alerts: SEED_ALERTS.slice(), alertSearch: '', alertSev: 'all', alertStatus: 'all',
+      users: SEED_USERS.slice(), userSearch: '', userPlatform: 'all', userStatus: 'all', selected: [],
+      menu: null, dialog: null
+    };
+  }
+
+  componentWillUnmount() {
+    Object.keys(this.timers).forEach(function (k) { clearInterval(this.timers[k]); clearTimeout(this.timers[k + 'wait']); }, this);
+  }
+
+  blankConv() {
+    return { messages: [], input: '', mentions: [], files: [], thinking: false, streamId: null, shown: 0, title: '', mentionOpen: false, mentionQuery: '' };
+  }
+
+  patchConv(key, patch) {
+    this.setState(function (s) {
+      const c = Object.assign({}, s.conv[key], typeof patch === 'function' ? patch(s.conv[key]) : patch);
+      const conv = Object.assign({}, s.conv); conv[key] = c;
+      return { conv: conv };
+    });
+  }
+
+  nextId() { this.uid += 1; return 'id' + this.uid; }
+
+  // ---------- chat engine ----------
+  pickResponse(text, mentionNames) {
+    const q = (text + ' ' + mentionNames.join(' ')).toLowerCase();
+    const page = this.state.page;
+    if (/summar/.test(q)) return this.pageSummary(page);
+    if (/insight/.test(q)) return this.pageInsight(page);
+    if (/hurricane|weather|storm/.test(q)) return R_WEATHER;
+    if (/deliver|route|shipping|logistic/.test(q)) return R_DELIVERY;
+    if (/alert|stock|inventory|oos|downtime|complain/.test(q)) return this.alertsAnswer();
+    if (/user|adoption|login|seat|analytics users/.test(q)) return this.usersAnswer();
+    if (/state|region|geo|california|texas|new york|florida/.test(q)) return R_STATES;
+    if (/categor|product|drink|beverage|energy|soda|vendor/.test(q)) return R_CATEGORIES;
+    if (/sales|revenue|profit|expense|month|growth|quarter|trend/.test(q)) return R_REVENUE;
+    if (/store|retailer|kpi|metric|dashboard|csi|overview/.test(q)) return this.kpiAnswer();
+    return R_HELP;
+  }
+
+  kpiAnswer() {
+    return [
+      H('CSI Dashboard at a glance'),
+      L('Footprint: ', '28 retailers and 47,520 stores.'),
+      L('Store health: ', '93.4% of stores are active, roughly 44,400 locations.'),
+      L('Analytics adoption: ', 'only 38.6% of 653 analytics users are active, about 252 people.'),
+      P('Store coverage is strong. The bigger opportunity is getting more analytics users to log in regularly.')
+    ];
+  }
+
+  alertsAnswer() {
+    const a = this.state.alerts;
+    const active = a.filter(function (x) { return x.status === 'Active'; });
+    const off = a.filter(function (x) { return x.status !== 'Active'; });
+    const critOff = off.filter(function (x) { return x.severity === 'Critical'; });
+    const blocks = [H('Alert rules'), P(active.length + ' of ' + a.length + ' alert rules are active.')];
+    active.forEach(function (x) { blocks.push(L(x.name + ' (' + x.severity + '): ', x.trigger + '.')); });
+    if (critOff.length) blocks.push(P('Heads up: ' + critOff.map(function (x) { return x.name; }).join(', ') + ' is your only Critical rule, and it’s switched off. You won’t hear about slow API responses until someone notices manually.'));
+    else if (off.length) blocks.push(P('Inactive: ' + off.map(function (x) { return x.name; }).join(', ') + '.'));
+    return blocks;
+  }
+
+  usersAnswer() {
+    const u = this.state.users;
+    const count = function (k, v) { return u.filter(function (x) { return x[k] === v; }).length; };
+    return [
+      H('User access'),
+      P(u.length + ' users are listed in Maintenance.'),
+      L('Active: ', count('status', 'Active') + '.'),
+      L('Pending: ', count('status', 'Pending') + (count('status', 'Pending') ? ', waiting on invite acceptance.' : '.')),
+      L('Inactive: ', count('status', 'Inactive') + '.'),
+      L('By platform: ', 'GlobalWorx ' + count('platform', 'GlobalWorx') + ', Acuity ' + count('platform', 'Acuity') + ', Insights ' + count('platform', 'Insights') + '.'),
+      P('Across the wider org, 38.6% of 653 analytics users are active, so following up on pending invites is an easy win.')
+    ];
+  }
+
+  pageSummary(page) {
+    if (page === 'alerts') return this.alertsAnswer();
+    if (page === 'users') return this.usersAnswer();
+    if (page === 'tessa') return R_HELP;
+    return [
+      H('Summary of the CSI Dashboard'),
+      L('Network: ', '28 retailers, 47,520 stores, 93.4% active.'),
+      L('Revenue: ', '$802K for the year, with $318K net profit and December the best month.'),
+      L('Geography: ', 'California, New York and Texas drive 55% of state revenue.'),
+      L('Categories: ', 'Carbonated Soft Drinks lead at 89%; Premium Mixers trail at 39%.'),
+      P('The one number I’d flag: only 38.6% of analytics users are active.')
+    ];
+  }
+
+  pageInsight(page) {
+    if (page === 'alerts') return this.alertsAnswer();
+    if (page === 'users') return this.usersAnswer();
+    return [
+      H('Quick insight'),
+      P('Expenses are growing almost as fast as revenue. Margin stayed between 38% and 42% all year, so the growth is real but isn’t getting more efficient.'),
+      L('Revenue: ', '+111% from January to December.'),
+      L('Expenses: ', '+96% over the same period.'),
+      P('Want me to look for the months where expenses outpaced revenue?')
+    ];
+  }
+
+  send(key, override) {
+    const c = this.state.conv[key];
+    const text = (override != null ? override : c.input).trim();
+    if (!text || c.thinking || c.streamId) return;
+    const mentions = override != null ? [] : c.mentions;
+    const files = override != null ? [] : c.files;
+    const msg = { id: this.nextId(), role: 'user', text: text, mentions: mentions, files: files };
+    this.patchConv(key, function (cc) {
+      return { messages: cc.messages.concat([msg]), input: '', mentions: [], files: [], thinking: true, mentionOpen: false, title: cc.messages.length ? cc.title : chatName(text) };
+    });
+    if (key === 'fab') this.setState({ fabView: 'chat' });
+    const self = this;
+    const names = mentions.map(function (m) { return m.name; });
+    this.timers[key + 'wait'] = setTimeout(function () { self.respond(key, text, names); }, 900);
+  }
+
+  respond(key, text, names) {
+    const blocks = this.pickResponse(text, names);
+    const total = blocks.reduce(function (n, b) { return n + b.lead.length + b.text.length; }, 0);
+    const id = this.nextId();
+    this.patchConv(key, function (cc) {
+      return { thinking: false, streamId: id, shown: 0, messages: cc.messages.concat([{ id: id, role: 'assistant', blocks: blocks, total: total }]) };
+    });
+    const self = this;
+    clearInterval(this.timers[key]);
+    this.timers[key] = setInterval(function () {
+      const cc = self.state.conv[key];
+      if (cc.streamId !== id) { clearInterval(self.timers[key]); return; }
+      const next = cc.shown + 5;
+      if (next >= total) {
+        clearInterval(self.timers[key]);
+        self.patchConv(key, { shown: total, streamId: null });
+      } else {
+        self.patchConv(key, { shown: next });
+      }
+    }, 22);
+  }
+
+  stop(key) {
+    clearTimeout(this.timers[key + 'wait']);
+    clearInterval(this.timers[key]);
+    const self = this;
+    this.patchConv(key, function (cc) {
+      if (cc.thinking) return { thinking: false };
+      if (!cc.streamId) return {};
+      const messages = cc.messages.map(function (m) {
+        if (m.id !== cc.streamId) return m;
+        return Object.assign({}, m, { blocks: self.cut(m.blocks, cc.shown), stopped: true });
+      });
+      return { messages: messages, streamId: null };
+    });
+  }
+
+  cut(blocks, shown) {
+    const out = [];
+    let left = shown;
+    for (let i = 0; i < blocks.length && left > 0; i++) {
+      const b = blocks[i];
+      const lead = b.lead.slice(0, left); left -= lead.length;
+      const text = b.text.slice(0, Math.max(0, left)); left -= text.length;
+      out.push({ kind: b.kind, lead: lead, text: text });
+    }
+    return out;
+  }
+
+  newChat(key) {
+    clearTimeout(this.timers[key + 'wait']);
+    clearInterval(this.timers[key]);
+    const conv = Object.assign({}, this.state.conv); conv[key] = this.blankConv();
+    this.setState({ conv: conv, historyOpen: false });
+    if (key === 'fab') this.setState({ fabView: 'home' });
+  }
+
+  // ---------- view model for one conversation ----------
+  convVM(key) {
+    const c = this.state.conv[key];
+    const self = this;
+    const busy = !!(c.thinking || c.streamId);
+    const q = c.mentionQuery.trim().toLowerCase();
+    const picked = c.mentions.map(function (m) { return m.id; });
+    const pool = MENTIONS.filter(function (m) {
+      return picked.indexOf(m.id) < 0 && (!q || (m.name + ' ' + m.description + ' ' + m.category).toLowerCase().indexOf(q) > -1);
+    });
+    const groups = [];
+    pool.forEach(function (m) {
+      let g = groups.filter(function (x) { return x.name === m.category; })[0];
+      if (!g) { g = { name: m.category, items: [] }; groups.push(g); }
+      g.items.push({ name: m.name, description: m.description, pick: function () {
+        self.patchConv(key, function (cc) { return { mentions: cc.mentions.concat([m]), mentionOpen: false, mentionQuery: '' }; });
+      } });
+    });
+
+    const msgs = c.messages.map(function (m) {
+      if (m.role === 'user') {
+        return {
+          isUser: true, isAssistant: false, text: m.text,
+          hasMentions: m.mentions.length > 0,
+          mentionsText: m.mentions.map(function (x) { return '@' + x.name; }).join(', '),
+          hasFiles: m.files.length > 0, files: m.files.map(function (f) { return { name: f }; }),
+          blocks: [], streaming: false, stopped: false
+        };
+      }
+      const live = m.id === c.streamId;
+      const blocks = (live ? self.cut(m.blocks, c.shown) : m.blocks).map(function (b) {
+        return { isH: b.kind === 'h', isP: b.kind === 'p', isLi: b.kind === 'li', lead: b.lead, text: b.text };
+      });
+      return { isUser: false, isAssistant: true, blocks: blocks, streaming: live, stopped: !!m.stopped, text: '', hasMentions: false, hasFiles: false, files: [], mentionsText: '' };
+    });
+
+    return {
+      isPrompt: c.messages.length === 0 && !c.thinking,
+      isChat: c.messages.length > 0 || c.thinking,
+      msgs: msgs, thinking: c.thinking,
+      input: c.input,
+      placeholder: key === 'fab' ? 'Ask Tessa about this page…' : 'Ask Tessa anything. Type @ to mention a chart or metric',
+      busy: busy, idle: !busy,
+      sendDisabled: !c.input.trim(),
+      sendBg: c.input.trim() ? '#00866A' : '#94A3B8',
+      sendCursor: c.input.trim() ? 'pointer' : 'not-allowed',
+      mentionOpen: c.mentionOpen, mentionAria: c.mentionOpen ? 'true' : 'false',
+      mentionQuery: c.mentionQuery, mentionGroups: groups, noMentions: groups.length === 0,
+      hasChips: c.mentions.length + c.files.length > 0,
+      mentionChips: c.mentions.map(function (m) {
+        return { name: m.name, remove: function () { self.patchConv(key, function (cc) { return { mentions: cc.mentions.filter(function (x) { return x.id !== m.id; }) }; }); } };
+      }),
+      fileChips: c.files.map(function (f, i) {
+        return { name: f, remove: function () { self.patchConv(key, function (cc) { return { files: cc.files.filter(function (_, j) { return j !== i; }) }; }); } };
+      }),
+      onInput: function (e) { self.patchConv(key, { input: e.target.value }); },
+      onKey: function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); self.send(key); }
+        else if (e.key === '@') { e.preventDefault(); self.patchConv(key, { mentionOpen: true, mentionQuery: '' }); }
+        else if (e.key === 'Escape') { self.patchConv(key, { mentionOpen: false }); }
+      },
+      onMentionQuery: function (e) { self.patchConv(key, { mentionQuery: e.target.value }); },
+      onMentionKey: function (e) { if (e.key === 'Escape') self.patchConv(key, { mentionOpen: false }); },
+      toggleMention: function () { self.patchConv(key, function (cc) { return { mentionOpen: !cc.mentionOpen, mentionQuery: '' }; }); },
+      onFiles: function (e) {
+        const names = Array.prototype.map.call(e.target.files || [], function (f) { return f.name; });
+        e.target.value = '';
+        if (names.length) self.patchConv(key, function (cc) { return { files: cc.files.concat(names) }; });
+      },
+      send: function () { self.send(key); },
+      stop: function () { self.stop(key); },
+      newChat: function () { self.newChat(key); },
+      newChatFromSheet: function () { self.newChat(key); }
+    };
+  }
+
+  openFromHistory(key, h) {
+    this.newChat(key);
+    const self = this;
+    setTimeout(function () {
+      self.send(key, h.prompt);
+      self.patchConv(key, { title: h.title });
+    }, 0);
+    if (key === 'main') this.setState({ historyOpen: false });
+  }
+
+  go(page) { this.setState({ page: page, menu: null, fabOpen: false }); }
+
+  // ---------- render ----------
+  renderVals() {
+    const s = this.state;
+    const self = this;
+    const page = s.page;
+    const open = s.sidebarOpen;
+    const activeColor = '#00B289', idle = '#C3CCD5';
+    const m = this.convVM('main');
+    const f = this.convVM('fab');
+
+    // charts
+    const maxV = 95000;
+    const months = MONTHS.map(function (x) {
+      const up = x.growth >= 0;
+      return {
+        month: x.month,
+        revH: Math.max(x.value / maxV * 100, 2) + '%',
+        expH: Math.max(x.expense / maxV * 100, 2) + '%',
+        tipBottom: 'calc(' + (x.value / maxV * 100) + '% + 6px)',
+        revLabel: usd(x.value), expLabel: usd(x.expense),
+        revShort: k$(x.value), expShort: k$(x.expense),
+        profitLabel: usd(x.value - x.expense),
+        growthLabel: (up ? '+' : '') + x.growth.toFixed(1) + '%',
+        growthBg: up ? '#047857' : '#DC2626',
+        growthText: up ? '#047857' : '#B91C1C'
+      };
+    });
+    const totalState = STATES.reduce(function (n, r) { return n + r[2]; }, 0);
+    let angle = 0;
+    const stops = [];
+    const states = STATES.map(function (r, i) {
+      const deg = r[2] / totalState * 360;
+      const a0 = angle + 1, a1 = angle + deg - 1;
+      stops.push('#ffffff ' + angle + 'deg ' + a0 + 'deg', DONUT[i] + ' ' + a0 + 'deg ' + a1 + 'deg', '#ffffff ' + a1 + 'deg ' + (angle + deg) + 'deg');
+      angle += deg;
+      const picked = s.donutPick === r[1];
+      return {
+        name: r[0], code: r[1], color: DONUT[i], valueLabel: '$' + r[2] + 'K',
+        pct: (r[2] / totalState * 100).toFixed(1) + '%',
+        barW: (r[2] / 890 * 100) + '%',
+        legendBg: picked ? '#F1F5F9' : 'transparent',
+        pressed: picked ? 'true' : 'false',
+        pick: function () { self.setState({ donutPick: picked ? null : r[1] }); }
+      };
+    });
+    const pickedState = STATES.filter(function (r) { return r[1] === s.donutPick; })[0];
+    const donutCenter = pickedState
+      ? { label: pickedState[0], value: '$' + pickedState[2] + 'K', sub: (pickedState[2] / totalState * 100).toFixed(1) + '% of total' }
+      : { label: 'Total', value: '$4.1M', sub: '8 states' };
+    const categories = CATEGORIES.map(function (c) { return { label: c[0], value: c[1], w: c[1] + '%' }; });
+
+    // alerts
+    const aq = s.alertSearch.trim().toLowerCase();
+    const sevStyle = {
+      Critical: ['#DC2626', '#FFFFFF', '#DC2626'], High: ['#00866A', '#FFFFFF', '#00866A'],
+      Medium: ['#F1F5F9', '#0F172A', '#F1F5F9'], Low: ['#FFFFFF', '#0F172A', '#CBD5E1']
+    };
+    const alertRows = s.alerts.filter(function (a) {
+      return (!aq || (a.name + ' ' + a.trigger).toLowerCase().indexOf(aq) > -1) &&
+        (s.alertSev === 'all' || a.severity.toLowerCase() === s.alertSev) &&
+        (s.alertStatus === 'all' || a.status.toLowerCase() === s.alertStatus);
+    }).map(function (a) {
+      const on = a.status === 'Active';
+      const sv = sevStyle[a.severity] || sevStyle.Low;
+      const menuOpen = s.menu === 'a' + a.id;
+      return {
+        name: a.name, trigger: a.trigger, severity: a.severity, status: a.status,
+        ariaOn: on ? 'true' : 'false', trackBg: on ? '#00866A' : '#CBD5E1', knobX: on ? '16px' : '0px',
+        sevBg: sv[0], sevColor: sv[1], sevBorder: sv[2],
+        statusBg: on ? '#E6F7F2' : '#F1F5F9', statusColor: on ? '#00664F' : '#475569',
+        menuOpen: menuOpen, menuAria: menuOpen ? 'true' : 'false',
+        toggle: function () { self.setState(function (st) { return { alerts: st.alerts.map(function (x) { return x.id === a.id ? Object.assign({}, x, { status: x.status === 'Active' ? 'Inactive' : 'Active' }) : x; }) }; }); },
+        openMenu: function () { self.setState({ menu: menuOpen ? null : 'a' + a.id }); },
+        edit: function () { self.setState({ menu: null, dialog: { kind: 'alert', editId: a.id, error: '', form: { name: a.name, trigger: a.trigger, severity: a.severity } } }); },
+        remove: function () { self.setState(function (st) { return { menu: null, alerts: st.alerts.filter(function (x) { return x.id !== a.id; }) }; }); }
+      };
+    });
+
+    // users
+    const uq = s.userSearch.trim().toLowerCase();
+    const plat = { GlobalWorx: ['#E0F7FC', '#005F73'], Acuity: ['#DFF5E8', '#00662A'], Insights: ['#DCF7EF', '#00664F'] };
+    const stat = { Active: ['#E6F7F2', '#00664F'], Inactive: ['#F1F5F9', '#475569'], Pending: ['#FEF3C7', '#92400E'] };
+    const visibleUsers = s.users.filter(function (u) {
+      return (!uq || (u.firstName + ' ' + u.lastName + ' ' + u.email).toLowerCase().indexOf(uq) > -1) &&
+        (s.userPlatform === 'all' || u.platform.toLowerCase() === s.userPlatform) &&
+        (s.userStatus === 'all' || u.status.toLowerCase() === s.userStatus);
+    });
+    const userRows = visibleUsers.map(function (u) {
+      const checked = s.selected.indexOf(u.id) > -1;
+      const menuOpen = s.menu === 'u' + u.id;
+      const pc = plat[u.platform] || plat.Insights, sc = stat[u.status] || stat.Inactive;
+      return {
+        firstName: u.firstName, lastName: u.lastName, email: u.email, platform: u.platform, status: u.status,
+        platBg: pc[0], platColor: pc[1], statusBg: sc[0], statusColor: sc[1],
+        checked: checked, menuOpen: menuOpen, menuAria: menuOpen ? 'true' : 'false',
+        toggle: function () { self.setState(function (st) { return { selected: checked ? st.selected.filter(function (x) { return x !== u.id; }) : st.selected.concat([u.id]) }; }); },
+        openMenu: function () { self.setState({ menu: menuOpen ? null : 'u' + u.id }); },
+        edit: function () { self.setState({ menu: null, dialog: { kind: 'user', editId: u.id, error: '', form: Object.assign({}, u) } }); },
+        remove: function () { self.setState(function (st) { return { menu: null, users: st.users.filter(function (x) { return x.id !== u.id; }), selected: st.selected.filter(function (x) { return x !== u.id; }) }; }); }
+      };
+    });
+    const allSelected = visibleUsers.length > 0 && visibleUsers.every(function (u) { return s.selected.indexOf(u.id) > -1; });
+
+    // dialog
+    const d = s.dialog;
+    const setForm = function (field) {
+      return function (e) { const v = e.target.value; self.setState(function (st) { const form = Object.assign({}, st.dialog.form); form[field] = v; return { dialog: Object.assign({}, st.dialog, { form: form, error: '' }) }; }); };
+    };
+    const form = d ? Object.assign({}, d.form, {
+      setName: setForm('name'), setTrigger: setForm('trigger'), setSeverity: setForm('severity'),
+      setFirst: setForm('firstName'), setLast: setForm('lastName'), setEmail: setForm('email'),
+      setPlatform: setForm('platform'), setStatus: setForm('status')
+    }) : {};
+
+    // history
+    const history = s.history.map(function (h) {
+      return {
+        title: h.title, ago: h.ago,
+        openM: function () { self.openFromHistory('main', h); },
+        openF: function () { self.openFromHistory('fab', h); },
+        remove: function () { self.setState(function (st) { return { history: st.history.filter(function (x) { return x.id !== h.id; }) }; }); }
+      };
+    });
+
+    const titles = { dashboard: 'CSI Dashboard', alerts: 'Alerts', users: 'Users', tessa: m.isChat ? (s.conv.main.title || 'New Chat') : 'Tessa' };
+    const fabConvTitle = s.conv.fab.title || 'New Chat';
+
+    return {
+      sideW: open ? '280px' : '64px', sideMax: open ? '100%' : '64px',
+      sidebarOpen: open, sidebarClosed: !open,
+      navJustify: open ? 'flex-start' : 'center', subIndent: open ? '16px' : '0px',
+      dashRot: s.dashOpen ? '90deg' : '0deg', maintRot: s.maintOpen ? '90deg' : '0deg',
+      dashOpenAria: s.dashOpen ? 'true' : 'false', maintOpenAria: s.maintOpen ? 'true' : 'false',
+      showDashSub: s.dashOpen || !open, showMaintSub: s.maintOpen || !open,
+      nav: {
+        dashColor: page === 'dashboard' ? activeColor : idle, dashCurrent: page === 'dashboard' ? 'page' : 'false',
+        tessaColor: page === 'tessa' ? activeColor : idle, tessaCurrent: page === 'tessa' ? 'page' : 'false',
+        alertsColor: page === 'alerts' ? activeColor : idle, alertsCurrent: page === 'alerts' ? 'page' : 'false',
+        usersColor: page === 'users' ? activeColor : idle, usersCurrent: page === 'users' ? 'page' : 'false'
+      },
+      toggleSidebar: function () { self.setState({ sidebarOpen: !s.sidebarOpen }); },
+      toggleDash: function () { if (open) self.setState({ dashOpen: !s.dashOpen }); else self.go('dashboard'); },
+      toggleMaint: function () { if (open) self.setState({ maintOpen: !s.maintOpen }); else self.go('users'); },
+      goDashboard: function () { self.go('dashboard'); },
+      goTessa: function () { self.go('tessa'); },
+      goAlerts: function () { self.go('alerts'); },
+      goUsers: function () { self.go('users'); },
+
+      pageTitle: titles[page],
+      isDashboard: page === 'dashboard', isTessa: page === 'tessa', isAlerts: page === 'alerts', isUsers: page === 'users',
+      showNewChatBtn: page === 'tessa' && m.isChat,
+      openHistory: function () { self.setState({ historyOpen: true }); },
+      closeHistory: function () { self.setState({ historyOpen: false }); },
+      historyOpen: s.historyOpen, historyAria: s.historyOpen ? 'true' : 'false',
+
+      kpis: KPIS, months: months, states: states, categories: categories,
+      netProfit: '$318,000', avgProfit: '$26,500', bestMonth: 'Dec',
+      donutStops: stops.join(', '), donutCenter: donutCenter,
+
+      m: m, f: f,
+      autoScrollPage: page === 'tessa' && (s.conv.main.thinking || !!s.conv.main.streamId),
+      tessaJustify: m.isPrompt ? 'center' : 'flex-start',
+      tessaPad: m.isPrompt ? '32px 16px 48px' : '0',
+      composerMax: m.isPrompt ? '768px' : '928px',
+      composerPos: m.isPrompt ? 'relative' : 'sticky',
+      composerPad: m.isPrompt ? '0' : '0 16px 16px',
+      composerBg: m.isPrompt ? 'transparent' : 'rgba(255,255,255,.88)',
+      suggestions: suggestionsFor(s.conv.main.input).map(function (t, i) {
+        return { text: t, border: i ? '1px solid #E2E8F0' : '0', pick: function () { self.send('main', t); } };
+      }),
+      history: history, noHistory: history.length === 0,
+
+      alertSearch: s.alertSearch, alertSev: s.alertSev, alertStatus: s.alertStatus,
+      onAlertSearch: function (e) { self.setState({ alertSearch: e.target.value }); },
+      onAlertSev: function (e) { self.setState({ alertSev: e.target.value }); },
+      onAlertStatus: function (e) { self.setState({ alertStatus: e.target.value }); },
+      alertRows: alertRows, noAlerts: alertRows.length === 0,
+      addAlert: function () { self.setState({ dialog: { kind: 'alert', editId: null, error: '', form: { name: '', trigger: '', severity: 'Medium' } } }); },
+
+      userSearch: s.userSearch, userPlatform: s.userPlatform, userStatus: s.userStatus,
+      onUserSearch: function (e) { self.setState({ userSearch: e.target.value }); },
+      onUserPlatform: function (e) { self.setState({ userPlatform: e.target.value }); },
+      onUserStatus: function (e) { self.setState({ userStatus: e.target.value }); },
+      userRows: userRows, noUsers: userRows.length === 0,
+      allSelected: allSelected,
+      toggleAll: function () {
+        const ids = visibleUsers.map(function (u) { return u.id; });
+        self.setState(function (st) { return { selected: allSelected ? st.selected.filter(function (x) { return ids.indexOf(x) < 0; }) : Array.from(new Set(st.selected.concat(ids))) }; });
+      },
+      hasSelection: s.selected.length > 0,
+      selectionLabel: s.selected.length + ' selected',
+      deleteSelected: function () { self.setState(function (st) { return { users: st.users.filter(function (u) { return st.selected.indexOf(u.id) < 0; }), selected: [] }; }); },
+      addUser: function () { self.setState({ dialog: { kind: 'user', editId: null, error: '', form: { firstName: '', lastName: '', email: '', platform: 'GlobalWorx', status: 'Pending' } } }); },
+
+      anyRowMenu: !!s.menu,
+      closeMenus: function () { self.setState({ menu: null }); },
+
+      dialogOpen: !!d,
+      dialogIsAlert: !!d && d.kind === 'alert', dialogIsUser: !!d && d.kind === 'user',
+      dialogTitle: d ? (d.editId ? 'Edit ' : 'Add ') + (d.kind === 'alert' ? 'alert' : 'user') : '',
+      dialogCta: d && d.editId ? 'Save changes' : (d && d.kind === 'user' ? 'Add user' : 'Create alert'),
+      form: form, formError: !!(d && d.error), formErrorText: d ? d.error : '',
+      closeDialog: function () { self.setState({ dialog: null }); },
+      saveDialog: function () {
+        const dd = self.state.dialog; if (!dd) return;
+        const fm = dd.form;
+        if (dd.kind === 'alert') {
+          if (!fm.name.trim() || !fm.trigger.trim()) { self.setState({ dialog: Object.assign({}, dd, { error: 'Give the alert a name and a trigger.' }) }); return; }
+          self.setState(function (st) {
+            const rec = { name: fm.name.trim(), trigger: fm.trigger.trim(), severity: fm.severity };
+            const alerts = dd.editId ? st.alerts.map(function (x) { return x.id === dd.editId ? Object.assign({}, x, rec) : x; })
+              : st.alerts.concat([Object.assign({ id: Date.now(), status: 'Active' }, rec)]);
+            return { alerts: alerts, dialog: null };
+          });
+        } else {
+          if (!fm.firstName.trim() || !fm.lastName.trim() || fm.email.indexOf('@') < 1) { self.setState({ dialog: Object.assign({}, dd, { error: 'Add a first name, last name and a valid email.' }) }); return; }
+          self.setState(function (st) {
+            const rec = { firstName: fm.firstName.trim(), lastName: fm.lastName.trim(), email: fm.email.trim(), platform: fm.platform, status: fm.status };
+            const users = dd.editId ? st.users.map(function (x) { return x.id === dd.editId ? Object.assign({}, x, rec) : x; })
+              : st.users.concat([Object.assign({ id: Date.now() }, rec)]);
+            return { users: users, dialog: null };
+          });
+        }
+      },
+
+      showFab: page !== 'tessa' && !s.fabOpen,
+      fabOpen: s.fabOpen,
+      openFab: function () { self.setState({ fabOpen: true }); },
+      closeFab: function () { self.setState({ fabOpen: false }); },
+      fabIsHome: s.fabView === 'home', fabIsChat: s.fabView === 'chat', fabIsHistory: s.fabView === 'history',
+      fabNotHome: s.fabView !== 'home', fabNotHistory: s.fabView !== 'history',
+      fabTitle: s.fabView === 'chat' ? fabConvTitle : (s.fabView === 'history' ? 'Chat History' : 'Tessa'),
+      fabPageName: PAGE_NAMES[page],
+      fabHome: function () { self.newChat('fab'); },
+      fabHistory: function () { self.setState({ fabView: 'history' }); },
+      fabSummarize: function () { self.send('fab', 'Summarize this page'); },
+      fabInsight: function () { self.send('fab', 'Give me a quick insight on what I’m looking at'); },
+      expandFab: function () {
+        const conv = Object.assign({}, self.state.conv);
+        const fc = conv.fab;
+        clearTimeout(self.timers.fabwait); clearInterval(self.timers.fab);
+        const users = fc.messages.filter(function (x) { return x.role === 'user'; });
+        const pending = fc.thinking && users.length ? users[users.length - 1] : null;
+        if (fc.messages.length) {
+          clearTimeout(self.timers.mainwait); clearInterval(self.timers.main);
+          conv.main = Object.assign({}, fc, { thinking: !!pending, streamId: null });
+          conv.fab = self.blankConv();
+        }
+        self.setState({ conv: conv, fabOpen: false, fabView: 'home', page: 'tessa' });
+        if (pending) {
+          self.timers.mainwait = setTimeout(function () { self.respond('main', pending.text, pending.mentions.map(function (x) { return x.name; })); }, 500);
+        }
+      }
+    };
+  }
+}
+
+
+window.__dcStart("\n\n<div style=\"min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch; font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif; color: #0F172A; background: #FFFFFF\">\n\n\n<nav aria-label=\"Main navigation\" style=\"width: {{sideW}}; flex: 1 1 {{sideW}}; max-width: {{sideMax}}; background: #131E29; color: #C3CCD5; display: flex; flex-direction: column; border-right: 1px solid #1F2937\">\n  <div style=\"height: 97px; display: flex; align-items: center; justify-content: center; padding: 0 24px; border-bottom: 1px solid #1F2937\">\n    <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\">\n      <img src=\"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTMwIiBoZWlnaHQ9IjQ2IiB2aWV3Qm94PSIwIDAgMTMwIDQ2IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMzIuMTM4OSAwSDE0LjMxNjZMMTIuNzg5NyAzLjk4NDk4SDI2LjUzNjlMMjAuMjA0IDIwLjQ3NTZIMjQuMjc5MUwzMi4xMzg5IDBaIiBmaWxsPSIjMDBCMjg5Ii8+CjxwYXRoIGQ9Ik0wLjg1NDgxMyAyNC40NjA2SDE4LjY3NzFMMjAuMjA0IDIwLjQ3NTZINi40NTY4MkwxMi43ODQ3IDMuOTg0OThIOC43MTQ2NEwwLjg1NDgxMyAyNC40NjA2WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTY0LjU5OTUgMTkuODk0OVYxMS42ODQ2QzY0LjU5OTUgNy4yMTkwMiA2MS40MDA1IDUuMDk2MzcgNTYuNzQ5NyA1LjA5NjM3QzUyLjY5NDYgNS4wOTYzNyA0OS44MjYgNi45OTM3NCA0OC45MzQ5IDkuOTMyNDJMNTIuMDIzOCAxMS41Njk1QzUyLjgwNDcgOS4yMjY1MyA1NC41MTY5IDguMjIwMjggNTYuODI0OCA4LjIyMDI4QzU5LjI0MjggOC4yMjAyOCA2MC42MTk1IDkuNjcyMDkgNjAuNjE5NSAxMS45MDQ5VjEyLjg3MTFMNTUuODkzNiAxMy43MjcyQzUxLjAxNzUgMTQuNTgzMiA0OC42Mzk1IDE2LjcwNTkgNDguNjM5NSAxOS41Njk1QzQ4LjYzOTUgMjIuODA4NSA1MS4yMDc4IDI0LjQ0NTYgNTQuNzA3MSAyNC40NDU2QzU3LjQ2MDYgMjQuNDQ1NiA1OS44NDM2IDIzLjQzOTMgNjAuOTk1IDIxLjY1MjFDNjIuNjA3IDI1LjQ0MTggNjYuNTgyIDI0LjQ2NTYgNjcuODc4NiAyMy45NDk5TDY2LjczNzIgMjAuODkxMUM2Ni40NTE4IDIxLjIwNjUgNjQuNTk5NSAyMS42NzIxIDY0LjU5OTUgMTkuODk0OVpNNjAuNjE0NSAxNy45MDI0QzYwLjYxNDUgMjAuMTM1MiA1OC4wNDYzIDIxLjQzNjggNTUuNTUzMiAyMS40MzY4QzUzLjgwNiAyMS40MzY4IDUyLjc2NDcgMjAuNjkwOSA1Mi43NjQ3IDE5LjMxNDFDNTIuNzY0NyAxNi41MjA3IDYwLjYxNDUgMTYgNjAuNjE0NSAxNlYxNy45MDI0WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTc2LjI0NDEgNS4wOTYzN0M3MC40MzY4IDUuMDk2MzcgNjYuOTc3NSA4LjcwNTg4IDY2Ljk3NzUgMTQuNzczNUM2Ni45Nzc1IDIwLjg0MTEgNzAuNDM2OCAyNC40NTA2IDc2LjMxOTIgMjQuNDUwNkM4MC42MzQ2IDI0LjQ1MDYgODMuNDI4IDIyLjI5MjkgODQuNDY5MyAxOC45MDM2TDgwLjgyNDggMTcuNjc3MUM4MC44MjQ4IDE3LjY3NzEgNzkuNjIzMyAyMC44OTExIDc2LjI0OTEgMjAuODkxMUM3Mi45NzUgMjAuODkxMSA3MS4wMDI1IDE5LjAxODggNzEuMDAyNSAxNC44MTM1QzcxLjAwMjUgMTAuNjA4MyA3Mi45Mzk5IDguNjY1ODMgNzYuMjQ5MSA4LjY2NTgzQzc5LjQwMyA4LjY2NTgzIDgwLjYwNDUgMTEuNzk5OCA4MC42MDQ1IDExLjc5OThMODQuMzI0MiAxMC4zMTI5QzgzLjE2MjcgNy4yNTkwNyA4MC43NDQ3IDUuMDk2MzcgNzYuMjQ0MSA1LjA5NjM3WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTExOC41NDIgNS40NzE4NEwxMTguMzU3IDguOTA2MTNDMTE3LjI3NSA2LjYyODI5IDExNC45OTMgNS4wOTYzNyAxMTIuMDA0IDUuMDk2MzdDMTA2LjkyMiA1LjA5NjM3IDEwMy43NDggOC42ODA4NSAxMDMuNzQ4IDE0Ljc3MzVDMTAzLjc0OCAyMC45MDExIDEwNi45NjIgMjQuNTI1NyAxMTIuMDQ0IDI0LjUyNTdDMTE0LjgwNyAyNC41MjU3IDExNi45NCAyMy4xNzkgMTE4LjA2MSAyMS4xMjY0VjMySDEyMi4wNjFWNS40NzE4NEgxMTguNTQyWk0xMTguMDU2IDE1LjAzODhDMTE4LjA1NiAxOC45MjM3IDExNi4wMzkgMjEuMjc2NiAxMTIuOSAyMS4yNzY2QzEwOS42ODYgMjEuMjc2NiAxMDcuNzQzIDE4Ljg4MzYgMTA3Ljc0MyAxNC44MTM1QzEwNy43NDMgMTAuNzQzNCAxMDkuNjg2IDguMzEwMzkgMTEyLjkgOC4zMTAzOUMxMTYuMDM5IDguMzEwMzkgMTE4LjA1NiAxMC42NjMzIDExOC4wNTYgMTQuNTg4MlYxNS4wMzg4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEwMi4xNzEgNS41NTE5NEg5OC4xOTE1VjI0LjA3NTFIMTAyLjE3MVY1LjU1MTk0WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEwMi4xNzYgMEg5OC4xOTE1VjMuOTg0OThIMTAyLjE3NlYwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTQ2LjI2MTYgMTkuNDI0M0M0NS41MjU3IDIwLjIwMDMgNDAuODc5OCAyMi4xMjI3IDQwLjg3OTggMTguNDk4MVY5LjMzMTY2SDQ2LjA5MTRMNDcuNTM4MiA1LjU1Njk1SDQwLjg3OThWMC4wMDUwMDQ4OEgzNi44OTk5VjE5LjE2OUMzNi45MzQ5IDIzLjAwMzggMzkuMzkzIDI0LjQ1NTYgNDIuNTkyIDI0LjQ1NTZDNDQuNTk5NSAyNC40NTU2IDQ2LjM1MTcgMjMuODU5OCA0Ny41NDMyIDIyLjg1MzZMNDYuMjYxNiAxOS40MjQzWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTk1LjM5OCAxOS40MjQzQzk0LjU3MiAyMC4yMDAzIDkwLjAxNjMgMjIuMTIyNyA5MC4wMTYzIDE4LjQ5ODFWOS4zMzE2Nkg5NS4yMjc4TDk2LjY3NDYgNS41NTY5NUg5MC4wMTYzVjAuMDA1MDA0ODhIODYuMDM2M1YxOS4xNjlDODYuMDcxMyAyMy4wMDM4IDg4LjUyOTQgMjQuNDU1NiA5MS43Mjg0IDI0LjQ1NTZDOTMuNzM1OSAyNC40NTU2IDk1LjQ4ODEgMjMuODU5OCA5Ni42Nzk2IDIyLjg1MzZMOTUuMzk4IDE5LjQyNDNaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTI5LjE0NSA3LjQ0NDMxQzEyOS4xNDUgOC44NjYwOCAxMjguMjE0IDkuNzg3MjMgMTI2Ljc4MiA5Ljc4NzIzQzEyNS4zNDUgOS43ODcyMyAxMjQuNDE5IDguODYxMDggMTI0LjQxOSA3LjQ0NDMxQzEyNC40MTkgNi4wMjc1MyAxMjUuMzUgNS4xMDEzOCAxMjYuNzgyIDUuMTAxMzhDMTI4LjIxNCA1LjA5NjM3IDEyOS4xNDUgNi4wMjI1MyAxMjkuMTQ1IDcuNDQ0MzFaTTEyOC42MTUgNy40NDQzMUMxMjguNjE1IDYuMzE3OSAxMjcuODk5IDUuNTkxOTkgMTI2Ljc4MiA1LjU5MTk5QzEyNS42NjYgNS41OTE5OSAxMjQuOTQgNi4zMjI5IDEyNC45NCA3LjQ0NDMxQzEyNC45NCA4LjU3MDcxIDEyNS42NjYgOS4zMDE2MyAxMjYuNzgyIDkuMzAxNjNDMTI3Ljg5OSA5LjI5NjYyIDEyOC42MTUgOC41NjU3MSAxMjguNjE1IDcuNDQ0MzFaTTEyNy4zMDggNy43NTk3TDEyNy45NjQgOC43MTA4OUgxMjcuMzQzTDEyNi43ODIgNy44MDk3NkgxMjYuMzk3VjguNzEwODlIMTI1Ljg2NlY2LjE3MjcySDEyNi45NjJDMTI3LjUxMyA2LjE3MjcyIDEyNy45MDkgNi40OTgxMiAxMjcuOTA5IDYuOTkzNzRDMTI3LjkwNCA3LjM4OTI0IDEyNy42NzggNy42NTk1NyAxMjcuMzA4IDcuNzU5N1pNMTI2LjM5NyA3LjQyNDI4SDEyNi45MDdDMTI3LjIwMyA3LjQyNDI4IDEyNy4zNjggNy4yOTQxMiAxMjcuMzY4IDcuMDA4NzZDMTI3LjM2OCA2LjcyMzQgMTI3LjIwMyA2LjU5MzI0IDEyNi45MDcgNi41OTMyNEgxMjYuMzk3VjcuNDI0MjhaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNTIuMzE1IDQwVjI5LjUwNEg1My42NDNWNDBINTIuMzE1Wk01Ni41MTgxIDQwVjI5LjUwNEg1Ny44OTQxTDYxLjY4NjEgMzYuMDk2TDYyLjgyMjEgMzguMjcySDYyLjg4NjFDNjIuODU0MSAzNy43Mzg3IDYyLjgxNjggMzcuMTg5MyA2Mi43NzQxIDM2LjYyNEM2Mi43NDIxIDM2LjA0OCA2Mi43MjYxIDM1LjQ4MjcgNjIuNzI2MSAzNC45MjhWMjkuNTA0SDYzLjk5MDFWNDBINjIuNjE0MUw1OC44MDYxIDMzLjM5Mkw1Ny42NzAxIDMxLjIzMkg1Ny42MDYxQzU3LjY0ODggMzEuNzU0NyA1Ny42ODYxIDMyLjI5MzMgNTcuNzE4MSAzMi44NDhDNTcuNzYwOCAzMy40MDI3IDU3Ljc4MjEgMzMuOTU3MyA1Ny43ODIxIDM0LjUxMlY0MEg1Ni41MTgxWk02OS43ODk1IDQwLjE5MkM2OS4wNTM1IDQwLjE5MiA2OC4zNzA4IDQwLjA1MzMgNjcuNzQxNSAzOS43NzZDNjcuMTEyMiAzOS40ODggNjYuNTY4MiAzOS4xMDkzIDY2LjEwOTUgMzguNjRMNjYuOTA5NSAzNy43MTJDNjcuMjgyOCAzOC4xMDY3IDY3LjcyMDIgMzguNDI2NyA2OC4yMjE1IDM4LjY3MkM2OC43MzM1IDM4LjkwNjcgNjkuMjYxNSAzOS4wMjQgNjkuODA1NSAzOS4wMjRDNzAuNDk4OCAzOS4wMjQgNzEuMDM3NSAzOC44NjkzIDcxLjQyMTUgMzguNTZDNzEuODA1NSAzOC4yNCA3MS45OTc1IDM3LjgyNCA3MS45OTc1IDM3LjMxMkM3MS45OTc1IDM2Ljk0OTMgNzEuOTE3NSAzNi42NjEzIDcxLjc1NzUgMzYuNDQ4QzcxLjYwODIgMzYuMjM0NyA3MS40MDAyIDM2LjA1MzMgNzEuMTMzNSAzNS45MDRDNzAuODc3NSAzNS43NTQ3IDcwLjU4NDIgMzUuNjA1MyA3MC4yNTM1IDM1LjQ1Nkw2OC43NDk1IDM0LjhDNjguNDE4OCAzNC42NjEzIDY4LjA4ODIgMzQuNDggNjcuNzU3NSAzNC4yNTZDNjcuNDM3NSAzNC4wMzIgNjcuMTY1NSAzMy43NDQgNjYuOTQxNSAzMy4zOTJDNjYuNzI4MiAzMy4wNCA2Ni42MjE1IDMyLjYwOCA2Ni42MjE1IDMyLjA5NkM2Ni42MjE1IDMxLjU2MjcgNjYuNzYwMiAzMS4wODggNjcuMDM3NSAzMC42NzJDNjcuMzI1NSAzMC4yNDUzIDY3LjcyMDIgMjkuOTE0NyA2OC4yMjE1IDI5LjY4QzY4LjcyMjggMjkuNDM0NyA2OS4yODgyIDI5LjMxMiA2OS45MTc1IDI5LjMxMkM3MC41NDY4IDI5LjMxMiA3MS4xMjgyIDI5LjQzNDcgNzEuNjYxNSAyOS42OEM3Mi4xOTQ4IDI5LjkxNDcgNzIuNjQ4MiAzMC4yMjQgNzMuMDIxNSAzMC42MDhMNzIuMzAxNSAzMS40NzJDNzEuOTgxNSAzMS4xNjI3IDcxLjYyNDIgMzAuOTIyNyA3MS4yMjk1IDMwLjc1MkM3MC44NDU1IDMwLjU3MDcgNzAuNDA4MiAzMC40OCA2OS45MTc1IDMwLjQ4QzY5LjMzMDggMzAuNDggNjguODU2MiAzMC42MTg3IDY4LjQ5MzUgMzAuODk2QzY4LjE0MTUgMzEuMTczMyA2Ny45NjU1IDMxLjU0NjcgNjcuOTY1NSAzMi4wMTZDNjcuOTY1NSAzMi4zNDY3IDY4LjA1MDggMzIuNjI0IDY4LjIyMTUgMzIuODQ4QzY4LjQwMjggMzMuMDYxMyA2OC42MjY4IDMzLjIzNzMgNjguODkzNSAzMy4zNzZDNjkuMTYwMiAzMy41MTQ3IDY5LjQzMjIgMzMuNjQyNyA2OS43MDk1IDMzLjc2TDcxLjE5NzUgMzQuNEM3MS42MDI4IDM0LjU3MDcgNzEuOTY1NSAzNC43Nzg3IDcyLjI4NTUgMzUuMDI0QzcyLjYxNjIgMzUuMjU4NyA3Mi44Nzc1IDM1LjU1MiA3My4wNjk1IDM1LjkwNEM3My4yNjE1IDM2LjI0NTMgNzMuMzU3NSAzNi42NzczIDczLjM1NzUgMzcuMkM3My4zNTc1IDM3Ljc1NDcgNzMuMjEzNSAzOC4yNjEzIDcyLjkyNTUgMzguNzJDNzIuNjM3NSAzOS4xNjggNzIuMjI2OCAzOS41MjUzIDcxLjY5MzUgMzkuNzkyQzcxLjE2MDIgNDAuMDU4NyA3MC41MjU1IDQwLjE5MiA2OS43ODk1IDQwLjE5MlpNNzUuNDI0NCA0MFYyOS41MDRINzYuNzUyNFY0MEg3NS40MjQ0Wk04My43NTU1IDQwLjE5MkM4Mi44MzgyIDQwLjE5MiA4Mi4wMjIyIDM5Ljk3ODcgODEuMzA3NSAzOS41NTJDODAuNTkyOCAzOS4xMTQ3IDgwLjAzMjggMzguNDkwNyA3OS42Mjc1IDM3LjY4Qzc5LjIyMjIgMzYuODY5MyA3OS4wMTk1IDM1Ljg5MzMgNzkuMDE5NSAzNC43NTJDNzkuMDE5NSAzMy42MjEzIDc5LjIyNzUgMzIuNjUwNyA3OS42NDM1IDMxLjg0QzgwLjA1OTUgMzEuMDI5MyA4MC42MzAyIDMwLjQwNTMgODEuMzU1NSAyOS45NjhDODIuMDgwOCAyOS41MzA3IDgyLjkwNzUgMjkuMzEyIDgzLjgzNTUgMjkuMzEyQzg0LjU2MDggMjkuMzEyIDg1LjE2ODggMjkuNDUwNyA4NS42NTk1IDI5LjcyOEM4Ni4xNjA4IDI5Ljk5NDcgODYuNTYwOCAzMC4yODggODYuODU5NSAzMC42MDhMODYuMTIzNSAzMS40NzJDODUuODU2OCAzMS4xOTQ3IDg1LjU0NzUgMzAuOTYgODUuMTk1NSAzMC43NjhDODQuODQzNSAzMC41NzYgODQuNDAwOCAzMC40OCA4My44Njc1IDMwLjQ4QzgzLjE2MzUgMzAuNDggODIuNTUwMiAzMC42NTYgODIuMDI3NSAzMS4wMDhDODEuNTA0OCAzMS4zNDkzIDgxLjA5OTUgMzEuODM0NyA4MC44MTE1IDMyLjQ2NEM4MC41MzQyIDMzLjA5MzMgODAuMzk1NSAzMy44NDUzIDgwLjM5NTUgMzQuNzJDODAuMzk1NSAzNi4wNDI3IDgwLjY5NDIgMzcuMDkzMyA4MS4yOTE1IDM3Ljg3MkM4MS44OTk1IDM4LjY0IDgyLjc2MzUgMzkuMDI0IDgzLjg4MzUgMzkuMDI0Qzg0LjI1NjggMzkuMDI0IDg0LjYxNDIgMzguOTcwNyA4NC45NTU1IDM4Ljg2NEM4NS4yOTY4IDM4Ljc0NjcgODUuNTY4OCAzOC41OTIgODUuNzcxNSAzOC40VjM1LjY2NEg4My41NDc1VjM0LjU2SDg2Ljk4NzVWMzguOTc2Qzg2LjY1NjggMzkuMzI4IDg2LjIwODggMzkuNjIxMyA4NS42NDM1IDM5Ljg1NkM4NS4wODg4IDQwLjA4IDg0LjQ1OTUgNDAuMTkyIDgzLjc1NTUgNDAuMTkyWk04OS41MDI1IDQwVjI5LjUwNEg5MC44MzA1VjMzLjkwNEg5NS43MTA1VjI5LjUwNEg5Ny4wNTQ1VjQwSDk1LjcxMDVWMzUuMDU2SDkwLjgzMDVWNDBIODkuNTAyNVpNMTAyLjExNiA0MFYzMC42MjRIOTguOTQ4VjI5LjUwNEgxMDYuNjI4VjMwLjYyNEgxMDMuNDZWNDBIMTAyLjExNlpNMTEwLjgwNSA0MC4xOTJDMTEwLjA2OSA0MC4xOTIgMTA5LjM4NiA0MC4wNTMzIDEwOC43NTcgMzkuNzc2QzEwOC4xMjggMzkuNDg4IDEwNy41ODQgMzkuMTA5MyAxMDcuMTI1IDM4LjY0TDEwNy45MjUgMzcuNzEyQzEwOC4yOTggMzguMTA2NyAxMDguNzM2IDM4LjQyNjcgMTA5LjIzNyAzOC42NzJDMTA5Ljc0OSAzOC45MDY3IDExMC4yNzcgMzkuMDI0IDExMC44MjEgMzkuMDI0QzExMS41MTQgMzkuMDI0IDExMi4wNTMgMzguODY5MyAxMTIuNDM3IDM4LjU2QzExMi44MjEgMzguMjQgMTEzLjAxMyAzNy44MjQgMTEzLjAxMyAzNy4zMTJDMTEzLjAxMyAzNi45NDkzIDExMi45MzMgMzYuNjYxMyAxMTIuNzczIDM2LjQ0OEMxMTIuNjI0IDM2LjIzNDcgMTEyLjQxNiAzNi4wNTMzIDExMi4xNDkgMzUuOTA0QzExMS44OTMgMzUuNzU0NyAxMTEuNiAzNS42MDUzIDExMS4yNjkgMzUuNDU2TDEwOS43NjUgMzQuOEMxMDkuNDM0IDM0LjY2MTMgMTA5LjEwNCAzNC40OCAxMDguNzczIDM0LjI1NkMxMDguNDUzIDM0LjAzMiAxMDguMTgxIDMzLjc0NCAxMDcuOTU3IDMzLjM5MkMxMDcuNzQ0IDMzLjA0IDEwNy42MzcgMzIuNjA4IDEwNy42MzcgMzIuMDk2QzEwNy42MzcgMzEuNTYyNyAxMDcuNzc2IDMxLjA4OCAxMDguMDUzIDMwLjY3MkMxMDguMzQxIDMwLjI0NTMgMTA4LjczNiAyOS45MTQ3IDEwOS4yMzcgMjkuNjhDMTA5LjczOCAyOS40MzQ3IDExMC4zMDQgMjkuMzEyIDExMC45MzMgMjkuMzEyQzExMS41NjIgMjkuMzEyIDExMi4xNDQgMjkuNDM0NyAxMTIuNjc3IDI5LjY4QzExMy4yMSAyOS45MTQ3IDExMy42NjQgMzAuMjI0IDExNC4wMzcgMzAuNjA4TDExMy4zMTcgMzEuNDcyQzExMi45OTcgMzEuMTYyNyAxMTIuNjQgMzAuOTIyNyAxMTIuMjQ1IDMwLjc1MkMxMTEuODYxIDMwLjU3MDcgMTExLjQyNCAzMC40OCAxMTAuOTMzIDMwLjQ4QzExMC4zNDYgMzAuNDggMTA5Ljg3MiAzMC42MTg3IDEwOS41MDkgMzAuODk2QzEwOS4xNTcgMzEuMTczMyAxMDguOTgxIDMxLjU0NjcgMTA4Ljk4MSAzMi4wMTZDMTA4Ljk4MSAzMi4zNDY3IDEwOS4wNjYgMzIuNjI0IDEwOS4yMzcgMzIuODQ4QzEwOS40MTggMzMuMDYxMyAxMDkuNjQyIDMzLjIzNzMgMTA5LjkwOSAzMy4zNzZDMTEwLjE3NiAzMy41MTQ3IDExMC40NDggMzMuNjQyNyAxMTAuNzI1IDMzLjc2TDExMi4yMTMgMzQuNEMxMTIuNjE4IDM0LjU3MDcgMTEyLjk4MSAzNC43Nzg3IDExMy4zMDEgMzUuMDI0QzExMy42MzIgMzUuMjU4NyAxMTMuODkzIDM1LjU1MiAxMTQuMDg1IDM1LjkwNEMxMTQuMjc3IDM2LjI0NTMgMTE0LjM3MyAzNi42NzczIDExNC4zNzMgMzcuMkMxMTQuMzczIDM3Ljc1NDcgMTE0LjIyOSAzOC4yNjEzIDExMy45NDEgMzguNzJDMTEzLjY1MyAzOS4xNjggMTEzLjI0MiAzOS41MjUzIDExMi43MDkgMzkuNzkyQzExMi4xNzYgNDAuMDU4NyAxMTEuNTQxIDQwLjE5MiAxMTAuODA1IDQwLjE5MloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==\" alt=\"tactiq INSIGHTS\" style=\"height: 46px; width: auto\"/>\n    <\/sc-if>\n    <sc-if value=\"{{sidebarClosed}}\" hint-placeholder-val=\"{{ false }}\">\n      <svg width=\"32\" height=\"32\" viewBox=\"0 0 41 40\" fill=\"none\" aria-hidden=\"true\"><path d=\"M35.9734 7.5H18.1701L16.6393 11.4819H30.3808L24.0528 27.9596H28.1197L35.9734 7.5Z\" fill=\"#00B289\"><\/path><path d=\"M4.71875 31.9415H22.5221L24.0528 27.9597H10.3164L16.6393 11.4819H12.5724L4.71875 31.9415Z\" fill=\"#C3CCD5\"><\/path><\/svg>\n    <\/sc-if>\n  <\/div>\n\n  <ul style=\"list-style: none; margin: 0; padding: 16px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1\">\n    <li>\n      <button class=\"nav\" style=\"color: #C3CCD5; justify-content: {{navJustify}}\" onClick=\"{{toggleDash}}\" aria-expanded=\"{{dashOpenAria}}\" aria-label=\"Dashboard\">\n        <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3v18h18\"><\/path><path d=\"M18 17V9\"><\/path><path d=\"M13 17V5\"><\/path><path d=\"M8 17v-3\"><\/path><\/svg>\n        <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\">\n          <span style=\"flex: 1\">Dashboard<\/span>\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"transform: rotate({{dashRot}}); transition: transform .2s\"><path d=\"m9 18 6-6-6-6\"><\/path><\/svg>\n        <\/sc-if>\n      <\/button>\n      <sc-if value=\"{{showDashSub}}\" hint-placeholder-val=\"{{ true }}\">\n        <div style=\"padding: 4px 0 0 {{subIndent}}\">\n          <button class=\"nav sub\" style=\"color: {{nav.dashColor}}; justify-content: {{navJustify}}\" onClick=\"{{goDashboard}}\" aria-current=\"{{nav.dashCurrent}}\" aria-label=\"CSI Dashboard\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"22 7 13.5 15.5 8.5 10.5 2 17\"><\/polyline><polyline points=\"16 7 22 7 22 13\"><\/polyline><\/svg>\n            <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\"><span>CSI Dashboard<\/span><\/sc-if>\n          <\/button>\n        <\/div>\n      <\/sc-if>\n    <\/li>\n    <li>\n      <button class=\"nav\" style=\"color: {{nav.tessaColor}}; justify-content: {{navJustify}}\" onClick=\"{{goTessa}}\" aria-current=\"{{nav.tessaCurrent}}\" aria-label=\"Tessa\">\n        <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n        <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\"><span>Tessa<\/span><\/sc-if>\n      <\/button>\n    <\/li>\n    <li>\n      <button class=\"nav\" style=\"color: {{nav.alertsColor}}; justify-content: {{navJustify}}\" onClick=\"{{goAlerts}}\" aria-current=\"{{nav.alertsCurrent}}\" aria-label=\"Alerts\">\n        <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z\"><\/path><path d=\"M12 9v4\"><\/path><path d=\"M12 17h.01\"><\/path><\/svg>\n        <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\"><span>Alerts<\/span><\/sc-if>\n      <\/button>\n    <\/li>\n    <li>\n      <button class=\"nav\" style=\"color: #C3CCD5; justify-content: {{navJustify}}\" onClick=\"{{toggleMaint}}\" aria-expanded=\"{{maintOpenAria}}\" aria-label=\"Maintenance\">\n        <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"><\/circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z\"><\/path><\/svg>\n        <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\">\n          <span style=\"flex: 1\">Maintenance<\/span>\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"transform: rotate({{maintRot}}); transition: transform .2s\"><path d=\"m9 18 6-6-6-6\"><\/path><\/svg>\n        <\/sc-if>\n      <\/button>\n      <sc-if value=\"{{showMaintSub}}\" hint-placeholder-val=\"{{ true }}\">\n        <div style=\"padding: 4px 0 0 {{subIndent}}\">\n          <button class=\"nav sub\" style=\"color: {{nav.usersColor}}; justify-content: {{navJustify}}\" onClick=\"{{goUsers}}\" aria-current=\"{{nav.usersCurrent}}\" aria-label=\"Users\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"><\/path><circle cx=\"9\" cy=\"7\" r=\"4\"><\/circle><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"><\/path><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"><\/path><\/svg>\n            <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\"><span>Users<\/span><\/sc-if>\n          <\/button>\n        <\/div>\n      <\/sc-if>\n    <\/li>\n  <\/ul>\n\n  <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\">\n    <div style=\"border-top: 1px solid #1F2937\">\n      <div style=\"display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid rgba(31,41,55,.5)\">\n        <span style=\"font-size: 14px; font-weight: 500; color: #C3CCD5\">employee@company.com<\/span>\n        <button class=\"nav\" style=\"width: 36px; min-height: 36px; padding: 0; justify-content: center; color: #C3CCD5\" aria-label=\"Sign out\">\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"><\/path><polyline points=\"16 17 21 12 16 7\"><\/polyline><line x1=\"21\" x2=\"9\" y1=\"12\" y2=\"12\"><\/line><\/svg>\n        <\/button>\n      <\/div>\n      <p style=\"margin: 0; padding: 14px 16px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #8A97A6; text-align: center\">A GlobalWorx product<\/p>\n    <\/div>\n  <\/sc-if>\n<\/nav>\n\n\n<div style=\"flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column\">\n\n  \n  <header style=\"min-height: 64px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 24px; border-bottom: 1px solid #E2E8F0; background: #fff; position: sticky; top: 0; z-index: 20\">\n    <button class=\"icon\" onClick=\"{{toggleSidebar}}\" aria-label=\"Toggle sidebar\" style=\"color: #0F172A\">\n      <sc-if value=\"{{sidebarOpen}}\" hint-placeholder-val=\"{{ true }}\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"><\/rect><path d=\"M9 3v18\"><\/path><path d=\"m16 15-3-3 3-3\"><\/path><\/svg><\/sc-if>\n      <sc-if value=\"{{sidebarClosed}}\" hint-placeholder-val=\"{{ false }}\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"><\/rect><path d=\"M9 3v18\"><\/path><path d=\"m14 9 3 3-3 3\"><\/path><\/svg><\/sc-if>\n    <\/button>\n\n    <div style=\"display: flex; align-items: center; gap: 8px; min-width: 0\">\n      <sc-if value=\"{{isTessa}}\" hint-placeholder-val=\"{{ false }}\">\n        <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n      <\/sc-if>\n      <sc-if value=\"{{isAlerts}}\" hint-placeholder-val=\"{{ false }}\">\n        <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z\"><\/path><path d=\"M12 9v4\"><\/path><path d=\"M12 17h.01\"><\/path><\/svg>\n      <\/sc-if>\n      <h1 style=\"margin: 0; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis\">{{pageTitle}}<\/h1>\n    <\/div>\n\n    <div style=\"margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px\">\n      <sc-if value=\"{{showNewChatBtn}}\" hint-placeholder-val=\"{{ false }}\">\n        <button class=\"ghost\" onClick=\"{{m.newChat}}\">\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"><\/path><path d=\"M12 5v14\"><\/path><\/svg>\n          New Chat\n        <\/button>\n      <\/sc-if>\n      <sc-if value=\"{{isTessa}}\" hint-placeholder-val=\"{{ false }}\">\n        <button class=\"ghost\" onClick=\"{{openHistory}}\" aria-expanded=\"{{historyAria}}\">\n          <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"><\/path><path d=\"M3 3v5h5\"><\/path><path d=\"M12 7v5l4 2\"><\/path><\/svg>\n          Chat History\n        <\/button>\n      <\/sc-if>\n    <\/div>\n  <\/header>\n\n  <main style=\"flex: 1; min-height: 0; display: flex; flex-direction: column\">\n\n    \n    <sc-if value=\"{{isDashboard}}\" hint-placeholder-val=\"{{ true }}\">\n      <section aria-label=\"CSI Dashboard\" style=\"flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: #F8FAFC\">\n        <div style=\"display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px\">\n          <p style=\"margin: 0; font-size: 14px; color: #64748B\">Last 12 months \u00b7 All retailers \u00b7 All regions<\/p>\n          <p style=\"margin: 0; font-size: 13px; color: #64748B\">Data powered by Looker \u00b7 demo snapshot<\/p>\n        <\/div>\n\n        <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px\">\n          <sc-for list=\"{{kpis}}\" as=\"k\" hint-placeholder-count=\"5\">\n            <div class=\"card\" style=\"padding: 20px\">\n              <div style=\"font-size: 14px; color: #64748B; font-weight: 500\">{{k.title}}<\/div>\n              <div style=\"font-size: 30px; font-weight: 600; margin-top: 6px\">{{k.value}}<\/div>\n            <\/div>\n          <\/sc-for>\n        <\/div>\n\n        <div class=\"card\" style=\"padding: 24px\">\n          <div style=\"display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; margin-bottom: 28px\">\n            <h2 style=\"margin: 0; font-size: 18px; font-weight: 600\">Monthly Revenue<\/h2>\n            <span style=\"display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #64748B\"><span style=\"width: 12px; height: 12px; border-radius: 3px; background: #10B981\"><\/span>Revenue<\/span>\n            <span style=\"display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #64748B\"><span style=\"width: 12px; height: 12px; border-radius: 3px; background: #8EA1BC\"><\/span>Expenses<\/span>\n            <span style=\"font-size: 13px; color: #64748B\">Net profit: {{netProfit}}<\/span>\n          <\/div>\n          <div style=\"overflow-x: auto\">\n            <div style=\"display: flex; align-items: flex-end; gap: 6px; height: 300px; min-width: 560px; padding-top: 36px\">\n              <sc-for list=\"{{months}}\" as=\"mo\" hint-placeholder-count=\"12\">\n                <div class=\"grp\" style=\"flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px\">\n                  <div style=\"position: relative; flex: 1; width: 100%; display: flex; align-items: flex-end; gap: 2px\">\n                    <div class=\"tip\" style=\"position: absolute; left: 50%; bottom: {{mo.tipBottom}}; transform: translateX(-50%); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none\">\n                      <span style=\"padding: 2px 7px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #fff; background: {{mo.growthBg}}; white-space: nowrap\">{{mo.growthLabel}}<\/span>\n                      <span style=\"padding: 2px 7px; border-radius: 4px; font-size: 12px; color: #fff; background: #0F172A; white-space: nowrap\">{{mo.revShort}} / {{mo.expShort}}<\/span>\n                    <\/div>\n                    <div class=\"bar\" style=\"flex: 1; border-radius: 4px 4px 0 0; background: #10B981; height: {{mo.revH}}\" title=\"Revenue {{mo.month}}: {{mo.revLabel}}\"><\/div>\n                    <div class=\"bar\" style=\"flex: 1; border-radius: 4px 4px 0 0; background: #8EA1BC; height: {{mo.expH}}\" title=\"Expenses {{mo.month}}: {{mo.expLabel}}\"><\/div>\n                  <\/div>\n                  <span style=\"font-size: 12px; font-weight: 500; color: #64748B\">{{mo.month}}<\/span>\n                <\/div>\n              <\/sc-for>\n            <\/div>\n          <\/div>\n          <div style=\"display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #E2E8F0; font-size: 14px; color: #64748B\">\n            <span>Avg profit: <strong style=\"color: #0F172A; font-weight: 600\">{{avgProfit}}<\/strong><\/span>\n            <span>Best month: <strong style=\"color: #047857; font-weight: 600\">{{bestMonth}}<\/strong><\/span>\n          <\/div>\n        <\/div>\n\n        <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px\">\n          <div class=\"card\" style=\"padding: 24px\">\n            <h2 style=\"margin: 0 0 20px; font-size: 18px; font-weight: 600\">Revenue by State<\/h2>\n            <div style=\"display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px\">\n              <div role=\"img\" aria-label=\"Doughnut chart of revenue by state\" style=\"position: relative; width: 220px; height: 220px; flex: none; border-radius: 50%; background: conic-gradient({{donutStops}})\">\n                <div style=\"position: absolute; inset: 52px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center\">\n                  <span style=\"font-size: 13px; color: #64748B\">{{donutCenter.label}}<\/span>\n                  <span style=\"font-size: 24px; font-weight: 700\">{{donutCenter.value}}<\/span>\n                  <span style=\"font-size: 13px; color: #64748B\">{{donutCenter.sub}}<\/span>\n                <\/div>\n              <\/div>\n              <div style=\"display: flex; flex-direction: column; gap: 2px; flex: 1 1 220px; min-width: 0\">\n                <sc-for list=\"{{states}}\" as=\"st\" hint-placeholder-count=\"8\">\n                  <button class=\"legend\" style=\"background: {{st.legendBg}}\" onClick=\"{{st.pick}}\" aria-pressed=\"{{st.pressed}}\">\n                    <span style=\"width: 12px; height: 12px; border-radius: 3px; background: {{st.color}}; flex: none\"><\/span>\n                    <span style=\"flex: 1\">{{st.name}}<\/span>\n                    <span style=\"font-weight: 600\">{{st.valueLabel}}<\/span>\n                    <span style=\"width: 48px; text-align: right; color: #64748B\">{{st.pct}}<\/span>\n                  <\/button>\n                <\/sc-for>\n              <\/div>\n            <\/div>\n          <\/div>\n\n          <div class=\"card\" style=\"padding: 24px\">\n            <h2 style=\"margin: 0 0 20px; font-size: 18px; font-weight: 600\">Category Performance (%)<\/h2>\n            <div style=\"display: flex; flex-direction: column; gap: 14px\">\n              <sc-for list=\"{{categories}}\" as=\"c\" hint-placeholder-count=\"10\">\n                <div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px\">\n                  <span style=\"flex: 0 1 190px; font-size: 14px; color: #475569\">{{c.label}}<\/span>\n                  <div style=\"flex: 1 1 140px; display: flex; align-items: center; gap: 10px\">\n                    <div style=\"flex: 1; height: 20px; border-radius: 999px; background: #F1F5F9\"><div style=\"height: 20px; border-radius: 999px; background: #0284C7; width: {{c.w}}\"><\/div><\/div>\n                    <span style=\"width: 40px; text-align: right; font-size: 14px; font-weight: 600\">{{c.value}}%<\/span>\n                  <\/div>\n                <\/div>\n              <\/sc-for>\n            <\/div>\n          <\/div>\n        <\/div>\n\n        <div class=\"card\" style=\"overflow-x: auto\">\n          <h2 style=\"margin: 0; padding: 20px 24px 12px; font-size: 18px; font-weight: 600\">Monthly Detail<\/h2>\n          <table style=\"width: 100%; border-collapse: collapse; min-width: 560px\">\n            <thead><tr><th style=\"padding-left: 24px\">Month<\/th><th style=\"text-align: right\">Revenue<\/th><th style=\"text-align: right\">Expenses<\/th><th style=\"text-align: right\">Profit<\/th><th style=\"text-align: right; padding-right: 24px\">MoM growth<\/th><\/tr><\/thead>\n            <tbody>\n              <sc-for list=\"{{months}}\" as=\"mo\" hint-placeholder-count=\"12\">\n                <tr class=\"row\"><td style=\"padding: 10px 16px 10px 24px\">{{mo.month}}<\/td><td style=\"padding: 10px 16px; text-align: right\">{{mo.revLabel}}<\/td><td style=\"padding: 10px 16px; text-align: right\">{{mo.expLabel}}<\/td><td style=\"padding: 10px 16px; text-align: right; font-weight: 600\">{{mo.profitLabel}}<\/td><td style=\"padding: 10px 24px 10px 16px; text-align: right; color: {{mo.growthText}}\">{{mo.growthLabel}}<\/td><\/tr>\n              <\/sc-for>\n            <\/tbody>\n          <\/table>\n        <\/div>\n      <\/section>\n    <\/sc-if>\n    \n    <sc-if value=\"{{isTessa}}\" hint-placeholder-val=\"{{ false }}\">\n      <section aria-label=\"Tessa chat\" style=\"flex: 1; display: flex; flex-direction: column; justify-content: {{tessaJustify}}; padding: {{tessaPad}}\">\n        <sc-if value=\"{{m.isPrompt}}\" hint-placeholder-val=\"{{ true }}\">\n          <div class=\"in\" style=\"width: 100%; max-width: 768px; margin: 0 auto 28px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center\">\n            <svg width=\"44\" height=\"44\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n            <h2 style=\"margin: 0; font-size: 30px; font-weight: 500\">How can Tessa help you today?<\/h2>\n          <\/div>\n        <\/sc-if>\n\n        <sc-if value=\"{{m.isChat}}\" hint-placeholder-val=\"{{ false }}\">\n          <div aria-live=\"polite\" style=\"flex: 1; width: 100%; max-width: 896px; margin: 0 auto; padding: 24px 16px 16px\">\n<sc-for list=\"{{m.msgs}}\" as=\"msg\" hint-placeholder-count=\"2\">\n  <sc-if value=\"{{msg.isUser}}\" hint-placeholder-val=\"{{ true }}\">\n    <div class=\"in\" style=\"display: flex; justify-content: flex-end; margin-bottom: 16px\">\n      <div style=\"max-width: 538px; margin-left: 48px; padding: 10px 16px; border-radius: 18px; background: #00866A; color: #fff; font-size: 16px; line-height: 1.5\">\n        <div style=\"white-space: pre-wrap; overflow-wrap: anywhere\">{{msg.text}}<\/div>\n        <sc-if value=\"{{msg.hasMentions}}\" hint-placeholder-val=\"{{ false }}\"><div style=\"margin-top: 4px; font-size: 13px; opacity: .9\">Mentions: {{msg.mentionsText}}<\/div><\/sc-if>\n        <sc-if value=\"{{msg.hasFiles}}\" hint-placeholder-val=\"{{ false }}\">\n          <div style=\"display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px\">\n            <sc-for list=\"{{msg.files}}\" as=\"fl\" hint-placeholder-count=\"1\"><span style=\"display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: rgba(255,255,255,.18); font-size: 13px\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"><\/path><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"><\/path><\/svg>{{fl.name}}<\/span><\/sc-for>\n          <\/div>\n        <\/sc-if>\n      <\/div>\n    <\/div>\n  <\/sc-if>\n  <sc-if value=\"{{msg.isAssistant}}\" hint-placeholder-val=\"{{ false }}\">\n    <div class=\"in\" style=\"margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: #0F172A\">\n      <sc-for list=\"{{msg.blocks}}\" as=\"b\" hint-placeholder-count=\"3\">\n        <sc-if value=\"{{b.isH}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0 0 6px; font-weight: 700\">{{b.text}}<\/p><\/sc-if>\n        <sc-if value=\"{{b.isP}}\" hint-placeholder-val=\"{{ true }}\"><p style=\"margin: 0 0 10px\">{{b.text}}<\/p><\/sc-if>\n        <sc-if value=\"{{b.isLi}}\" hint-placeholder-val=\"{{ false }}\"><div style=\"display: flex; gap: 10px; margin: 0 0 6px; padding-left: 4px\"><span aria-hidden=\"true\" style=\"flex: none; width: 6px; height: 6px; margin-top: 10px; border-radius: 50%; background: #00B289\"><\/span><span><strong style=\"font-weight: 600\">{{b.lead}}<\/strong>{{b.text}}<\/span><\/div><\/sc-if>\n      <\/sc-for>\n      <sc-if value=\"{{msg.streaming}}\" hint-placeholder-val=\"{{ false }}\"><span class=\"caret\" aria-hidden=\"true\"><\/span><\/sc-if>\n      <sc-if value=\"{{msg.stopped}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 4px 0 0; font-size: 13px; color: #64748B\">Response stopped.<\/p><\/sc-if>\n    <\/div>\n  <\/sc-if>\n<\/sc-for>\n<sc-if value=\"{{m.thinking}}\" hint-placeholder-val=\"{{ false }}\">\n  <div class=\"in\" style=\"display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 16px; border-radius: 16px; background: #E6F7F2; border: 1px solid #B3E6D8; color: #00664F\">\n    <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n    <span style=\"font-size: 14px; font-weight: 600\">Tessa is thinking<\/span>\n    <span style=\"display: flex; gap: 3px\"><span class=\"dot\"><\/span><span class=\"dot\" style=\"animation-delay: .2s\"><\/span><span class=\"dot\" style=\"animation-delay: .4s\"><\/span><\/span>\n  <\/div>\n<\/sc-if>\n          <\/div>\n        <\/sc-if>\n\n        <div style=\"width: 100%; max-width: {{composerMax}}; margin: 0 auto; position: {{composerPos}}; bottom: 0; padding: {{composerPad}}; background: {{composerBg}}\">\n<div style=\"position: relative\">\n  <sc-if value=\"{{m.mentionOpen}}\" hint-placeholder-val=\"{{ false }}\">\n    <div style=\"position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); z-index: 40; max-height: 320px; overflow-y: auto; padding: 8px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 16px 40px rgba(15,23,42,.16)\">\n      <label for=\"m-mq\" class=\"sr-only\">Search mentions<\/label>\n      <input id=\"m-mq\" class=\"field\" style=\"height: 38px; font-size: 14px\" placeholder=\"Search dashboards, charts, metrics\u2026\" value=\"{{m.mentionQuery}}\" onChange=\"{{m.onMentionQuery}}\" onKeyDown=\"{{m.onMentionKey}}\"/>\n      <sc-for list=\"{{m.mentionGroups}}\" as=\"g\" hint-placeholder-count=\"2\">\n        <div style=\"padding: 10px 10px 4px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #64748B\">{{g.name}}<\/div>\n        <sc-for list=\"{{g.items}}\" as=\"mi\" hint-placeholder-count=\"2\">\n          <button class=\"mitem\" onClick=\"{{mi.pick}}\"><span style=\"font-size: 14px; font-weight: 600\">{{mi.name}}<\/span><span style=\"font-size: 13px; color: #64748B\">{{mi.description}}<\/span><\/button>\n        <\/sc-for>\n      <\/sc-for>\n      <sc-if value=\"{{m.noMentions}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0; padding: 12px 10px; font-size: 14px; color: #64748B\">No matches.<\/p><\/sc-if>\n    <\/div>\n  <\/sc-if>\n  <div class=\"composer\" style=\"display: flex; flex-direction: column; gap: 10px; padding: 14px 8px 8px 16px; background: #fff; border: 1px solid #CBD5E1; border-radius: 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06)\">\n    <sc-if value=\"{{m.hasChips}}\" hint-placeholder-val=\"{{ false }}\">\n      <div style=\"display: flex; flex-wrap: wrap; gap: 6px; padding-right: 8px\">\n        <sc-for list=\"{{m.mentionChips}}\" as=\"ch\" hint-placeholder-count=\"1\">\n          <span style=\"display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 4px 0 10px; border-radius: 999px; background: #E6F7F2; color: #00664F; font-size: 13px; font-weight: 600\">@{{ch.name}}<button class=\"chipx\" aria-label=\"Remove {{ch.name}}\" onClick=\"{{ch.remove}}\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button><\/span>\n        <\/sc-for>\n        <sc-for list=\"{{m.fileChips}}\" as=\"fc\" hint-placeholder-count=\"1\">\n          <span style=\"display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 4px 0 10px; border-radius: 6px; background: #F1F5F9; color: #334155; font-size: 13px\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"><\/path><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"><\/path><\/svg>{{fc.name}}<button class=\"chipx\" aria-label=\"Remove {{fc.name}}\" onClick=\"{{fc.remove}}\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button><\/span>\n        <\/sc-for>\n      <\/div>\n    <\/sc-if>\n    <label for=\"m-ta\" class=\"sr-only\">Message Tessa<\/label>\n    <textarea id=\"m-ta\" class=\"ta\" rows=\"2\" placeholder=\"{{m.placeholder}}\" value=\"{{m.input}}\" onChange=\"{{m.onInput}}\" onKeyDown=\"{{m.onKey}}\"><\/textarea>\n    <div style=\"display: flex; align-items: center; justify-content: space-between\">\n      <div style=\"display: flex; align-items: center; gap: 2px\">\n        <button class=\"icon\" title=\"Mention (@)\" aria-label=\"Mention a dashboard, chart or metric\" aria-expanded=\"{{m.mentionAria}}\" onClick=\"{{m.toggleMention}}\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"><\/circle><path d=\"M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8\"><\/path><\/svg><\/button>\n        <label class=\"icon\" title=\"Attach files\" style=\"cursor: pointer\"><input type=\"file\" multiple=\"multiple\" class=\"sr-only\" onChange=\"{{m.onFiles}}\"/><span class=\"sr-only\">Attach files<\/span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48\"><\/path><\/svg><\/label>\n      <\/div>\n      <sc-if value=\"{{m.busy}}\" hint-placeholder-val=\"{{ false }}\">\n        <button aria-label=\"Stop generating\" onClick=\"{{m.stop}}\" style=\"width: 36px; height: 36px; border: 0; border-radius: 50%; background: #0F172A; color: #fff; display: flex; align-items: center; justify-content: center\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"5\" y=\"5\" rx=\"2\" fill=\"currentColor\"><\/rect><\/svg><\/button>\n      <\/sc-if>\n      <sc-if value=\"{{m.idle}}\" hint-placeholder-val=\"{{ true }}\">\n        <button aria-label=\"Send message\" onClick=\"{{m.send}}\" disabled=\"{{m.sendDisabled}}\" style=\"width: 36px; height: 36px; border: 0; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; background: {{m.sendBg}}; cursor: {{m.sendCursor}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12 7-7 7 7\"><\/path><path d=\"M12 19V5\"><\/path><\/svg><\/button>\n      <\/sc-if>\n    <\/div>\n  <\/div>\n<\/div>\n        <\/div>\n\n        <sc-if value=\"{{m.isPrompt}}\" hint-placeholder-val=\"{{ true }}\">\n          <div style=\"width: 100%; max-width: 768px; margin: 8px auto 0; padding: 0 8px\">\n            <sc-for list=\"{{suggestions}}\" as=\"sg\" hint-placeholder-count=\"3\">\n              <button class=\"sugg\" onClick=\"{{sg.pick}}\" style=\"border-top: {{sg.border}}\">\n                <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"><\/path><path d=\"M8 12h.01\"><\/path><path d=\"M12 12h.01\"><\/path><path d=\"M16 12h.01\"><\/path><\/svg>\n                <span style=\"overflow: hidden; text-overflow: ellipsis; white-space: nowrap\">{{sg.text}}<\/span>\n              <\/button>\n            <\/sc-for>\n          <\/div>\n        <\/sc-if>\n      <\/section>\n    <\/sc-if>\n\n    \n    <sc-if value=\"{{isAlerts}}\" hint-placeholder-val=\"{{ false }}\">\n      <section aria-label=\"Alerts\" style=\"padding: 24px; display: flex; flex-direction: column; gap: 20px\">\n        <div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: 12px\">\n          <div style=\"position: relative; flex: 0 1 364px; min-width: 220px\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#64748B\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"position: absolute; left: 12px; top: 12px\"><circle cx=\"11\" cy=\"11\" r=\"8\"><\/circle><path d=\"m21 21-4.3-4.3\"><\/path><\/svg>\n            <label for=\"alert-search\" class=\"sr-only\">Search alerts<\/label>\n            <input id=\"alert-search\" class=\"field\" style=\"padding-left: 36px\" placeholder=\"Search alerts...\" value=\"{{alertSearch}}\" onChange=\"{{onAlertSearch}}\"/>\n          <\/div>\n          <label for=\"alert-sev\" class=\"sr-only\">Severity<\/label>\n          <select id=\"alert-sev\" class=\"field\" style=\"width: 150px\" value=\"{{alertSev}}\" onChange=\"{{onAlertSev}}\">\n            <option value=\"all\">All Severity<\/option><option value=\"critical\">Critical<\/option><option value=\"high\">High<\/option><option value=\"medium\">Medium<\/option><option value=\"low\">Low<\/option>\n          <\/select>\n          <label for=\"alert-status\" class=\"sr-only\">Status<\/label>\n          <select id=\"alert-status\" class=\"field\" style=\"width: 130px\" value=\"{{alertStatus}}\" onChange=\"{{onAlertStatus}}\">\n            <option value=\"all\">All Status<\/option><option value=\"active\">Active<\/option><option value=\"inactive\">Inactive<\/option>\n          <\/select>\n          <button class=\"primary\" style=\"margin-left: auto\" onClick=\"{{addAlert}}\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19.3 14.8C20.1 16.4 21 17 21 17H3s3-2 3-9c0-3.3 2.7-6 6-6 1 0 1.9.2 2.8.7\"><\/path><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"><\/path><path d=\"M15 8h6\"><\/path><path d=\"M18 5v6\"><\/path><\/svg>\n            Add Alert\n          <\/button>\n        <\/div>\n        <div style=\"border: 1px solid #E2E8F0; border-radius: 8px; overflow-x: auto\">\n          <table style=\"width: 100%; border-collapse: collapse; min-width: 760px\">\n            <thead><tr><th>Active<\/th><th>Name<\/th><th>Trigger<\/th><th>Severity<\/th><th>Status<\/th><th style=\"width: 90px\">Action<\/th><\/tr><\/thead>\n            <tbody>\n              <sc-for list=\"{{alertRows}}\" as=\"a\" hint-placeholder-count=\"4\">\n                <tr class=\"row\">\n                  <td><button class=\"switch\" role=\"switch\" aria-checked=\"{{a.ariaOn}}\" aria-label=\"Toggle {{a.name}}\" style=\"background: {{a.trackBg}}\" onClick=\"{{a.toggle}}\"><span style=\"transform: translateX({{a.knobX}})\"><\/span><\/button><\/td>\n                  <td style=\"font-weight: 600\">{{a.name}}<\/td>\n                  <td style=\"color: #64748B\">{{a.trigger}}<\/td>\n                  <td><span class=\"badge\" style=\"background: {{a.sevBg}}; color: {{a.sevColor}}; border: 1px solid {{a.sevBorder}}\">{{a.severity}}<\/span><\/td>\n                  <td><span class=\"badge\" style=\"background: {{a.statusBg}}; color: {{a.statusColor}}\">{{a.status}}<\/span><\/td>\n                  <td>\n                    <div style=\"position: relative\">\n                      <button class=\"icon\" aria-label=\"Actions for {{a.name}}\" aria-expanded=\"{{a.menuAria}}\" onClick=\"{{a.openMenu}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"><\/circle><circle cx=\"19\" cy=\"12\" r=\"1\"><\/circle><circle cx=\"5\" cy=\"12\" r=\"1\"><\/circle><\/svg><\/button>\n                      <sc-if value=\"{{a.menuOpen}}\" hint-placeholder-val=\"{{ false }}\">\n                        <div class=\"menu\">\n                          <button onClick=\"{{a.edit}}\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z\"><\/path><\/svg>Edit<\/button>\n                          <button onClick=\"{{a.remove}}\" style=\"color: #DC2626\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 6h18\"><\/path><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"><\/path><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"><\/path><\/svg>Delete<\/button>\n                        <\/div>\n                      <\/sc-if>\n                    <\/div>\n                  <\/td>\n                <\/tr>\n              <\/sc-for>\n              <sc-if value=\"{{noAlerts}}\" hint-placeholder-val=\"{{ false }}\">\n                <tr><td colspan=\"6\" style=\"text-align: center; color: #64748B; padding: 32px\">No alerts found matching your criteria.<\/td><\/tr>\n              <\/sc-if>\n            <\/tbody>\n          <\/table>\n        <\/div>\n      <\/section>\n    <\/sc-if>\n\n    \n    <sc-if value=\"{{isUsers}}\" hint-placeholder-val=\"{{ false }}\">\n      <section aria-label=\"Users\" style=\"padding: 24px; display: flex; flex-direction: column; gap: 20px\">\n        <div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: 12px\">\n          <div style=\"position: relative; flex: 0 1 364px; min-width: 220px\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#64748B\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"position: absolute; left: 12px; top: 12px\"><circle cx=\"11\" cy=\"11\" r=\"8\"><\/circle><path d=\"m21 21-4.3-4.3\"><\/path><\/svg>\n            <label for=\"user-search\" class=\"sr-only\">Search users<\/label>\n            <input id=\"user-search\" class=\"field\" style=\"padding-left: 36px\" placeholder=\"Search users...\" value=\"{{userSearch}}\" onChange=\"{{onUserSearch}}\"/>\n          <\/div>\n          <label for=\"user-platform\" class=\"sr-only\">Platform<\/label>\n          <select id=\"user-platform\" class=\"field\" style=\"width: 160px\" value=\"{{userPlatform}}\" onChange=\"{{onUserPlatform}}\">\n            <option value=\"all\">All Platforms<\/option><option value=\"globalworx\">GlobalWorx<\/option><option value=\"acuity\">Acuity<\/option><option value=\"insights\">Insights<\/option>\n          <\/select>\n          <label for=\"user-status\" class=\"sr-only\">Status<\/label>\n          <select id=\"user-status\" class=\"field\" style=\"width: 130px\" value=\"{{userStatus}}\" onChange=\"{{onUserStatus}}\">\n            <option value=\"all\">All Status<\/option><option value=\"active\">Active<\/option><option value=\"inactive\">Inactive<\/option><option value=\"pending\">Pending<\/option>\n          <\/select>\n          <sc-if value=\"{{hasSelection}}\" hint-placeholder-val=\"{{ false }}\">\n            <span style=\"font-size: 14px; color: #64748B\">{{selectionLabel}}<\/span>\n            <button class=\"outline\" style=\"color: #DC2626\" onClick=\"{{deleteSelected}}\">Delete selected<\/button>\n          <\/sc-if>\n          <button class=\"primary\" style=\"margin-left: auto\" onClick=\"{{addUser}}\">\n            <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"><\/path><circle cx=\"9\" cy=\"7\" r=\"4\"><\/circle><line x1=\"19\" x2=\"19\" y1=\"8\" y2=\"14\"><\/line><line x1=\"22\" x2=\"16\" y1=\"11\" y2=\"11\"><\/line><\/svg>\n            Add User\n          <\/button>\n        <\/div>\n        <div style=\"border: 1px solid #E2E8F0; border-radius: 8px; overflow-x: auto\">\n          <table style=\"width: 100%; border-collapse: collapse; min-width: 820px\">\n            <thead><tr>\n              <th style=\"width: 48px\"><input type=\"checkbox\" aria-label=\"Select all users\" checked=\"{{allSelected}}\" onChange=\"{{toggleAll}}\" style=\"width: 16px; height: 16px; accent-color: #00866A\"/><\/th>\n              <th>First Name<\/th><th>Last Name<\/th><th>Email<\/th><th>Platform<\/th><th>Status<\/th><th style=\"width: 90px\">Action<\/th>\n            <\/tr><\/thead>\n            <tbody>\n              <sc-for list=\"{{userRows}}\" as=\"u\" hint-placeholder-count=\"5\">\n                <tr class=\"row\">\n                  <td><input type=\"checkbox\" aria-label=\"Select {{u.firstName}} {{u.lastName}}\" checked=\"{{u.checked}}\" onChange=\"{{u.toggle}}\" style=\"width: 16px; height: 16px; accent-color: #00866A\"/><\/td>\n                  <td style=\"font-weight: 600\">{{u.firstName}}<\/td>\n                  <td style=\"font-weight: 600\">{{u.lastName}}<\/td>\n                  <td style=\"color: #64748B\">{{u.email}}<\/td>\n                  <td><span class=\"badge\" style=\"background: {{u.platBg}}; color: {{u.platColor}}\">{{u.platform}}<\/span><\/td>\n                  <td><span class=\"badge\" style=\"background: {{u.statusBg}}; color: {{u.statusColor}}\">{{u.status}}<\/span><\/td>\n                  <td>\n                    <div style=\"position: relative\">\n                      <button class=\"icon\" aria-label=\"Actions for {{u.firstName}} {{u.lastName}}\" aria-expanded=\"{{u.menuAria}}\" onClick=\"{{u.openMenu}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"><\/circle><circle cx=\"19\" cy=\"12\" r=\"1\"><\/circle><circle cx=\"5\" cy=\"12\" r=\"1\"><\/circle><\/svg><\/button>\n                      <sc-if value=\"{{u.menuOpen}}\" hint-placeholder-val=\"{{ false }}\">\n                        <div class=\"menu\">\n                          <button onClick=\"{{u.edit}}\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z\"><\/path><\/svg>Edit<\/button>\n                          <button onClick=\"{{u.remove}}\" style=\"color: #DC2626\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 6h18\"><\/path><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"><\/path><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"><\/path><\/svg>Delete<\/button>\n                        <\/div>\n                      <\/sc-if>\n                    <\/div>\n                  <\/td>\n                <\/tr>\n              <\/sc-for>\n              <sc-if value=\"{{noUsers}}\" hint-placeholder-val=\"{{ false }}\">\n                <tr><td colspan=\"7\" style=\"text-align: center; color: #64748B; padding: 32px\">No users found matching your criteria.<\/td><\/tr>\n              <\/sc-if>\n            <\/tbody>\n          <\/table>\n        <\/div>\n      <\/section>\n    <\/sc-if>\n  <\/main>\n<\/div>\n\n\n<sc-if value=\"{{anyRowMenu}}\" hint-placeholder-val=\"{{ false }}\">\n  <button aria-label=\"Close menu\" onClick=\"{{closeMenus}}\" style=\"position: fixed; inset: 0; z-index: 25; border: 0; background: transparent; cursor: default\"><\/button>\n<\/sc-if>\n\n\n<sc-if value=\"{{historyOpen}}\" hint-placeholder-val=\"{{ false }}\">\n  <button aria-label=\"Close chat history\" onClick=\"{{closeHistory}}\" style=\"position: fixed; inset: 0; z-index: 60; border: 0; background: rgba(15,23,42,.4); cursor: default\"><\/button>\n  <aside aria-label=\"Chat history\" class=\"in\" style=\"position: fixed; top: 0; right: 0; bottom: 0; z-index: 61; width: min(320px, 92vw); background: #fff; border-left: 1px solid #E2E8F0; box-shadow: -10px 0 30px rgba(15,23,42,.12); padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto\">\n    <div style=\"display: flex; align-items: center; justify-content: space-between\">\n      <h2 style=\"margin: 0; font-size: 18px; font-weight: 600\">Chat History<\/h2>\n      <button class=\"icon\" aria-label=\"Close\" onClick=\"{{closeHistory}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button>\n    <\/div>\n<div style=\"display: flex; flex-direction: column; gap: 2px\">\n  <sc-for list=\"{{history}}\" as=\"h\" hint-placeholder-count=\"6\">\n    <div class=\"hist\">\n      <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none; margin-top: 2px; color: #64748B\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"><\/path><\/svg>\n      <button class=\"histopen\" onClick=\"{{h.openM}}\"><span style=\"display: block; font-size: 14px; font-weight: 600\">{{h.title}}<\/span><span style=\"display: block; margin-top: 2px; font-size: 12px; color: #64748B\">{{h.ago}}<\/span><\/button>\n      <button class=\"icon del\" aria-label=\"Delete {{h.title}}\" onClick=\"{{h.remove}}\" style=\"width: 32px; height: 32px\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 6h18\"><\/path><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"><\/path><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"><\/path><\/svg><\/button>\n    <\/div>\n  <\/sc-for>\n  <sc-if value=\"{{noHistory}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0; padding: 12px; font-size: 14px; color: #64748B\">No previous chats.<\/p><\/sc-if>\n<\/div>\n    <div style=\"padding-top: 12px; border-top: 1px solid #E2E8F0\">\n      <button class=\"ghost\" style=\"width: 100%; justify-content: flex-start; min-height: 44px; font-size: 15px\" onClick=\"{{m.newChatFromSheet}}\">\n        <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"><\/path><path d=\"M12 5v14\"><\/path><\/svg>\n        Start a new chat\n      <\/button>\n    <\/div>\n  <\/aside>\n<\/sc-if>\n\n\n<sc-if value=\"{{showFab}}\" hint-placeholder-val=\"{{ true }}\">\n  <button class=\"fab\" aria-label=\"Open Tessa chat\" title=\"Tessa AI \u2014 ask Tessa anything\" onClick=\"{{openFab}}\" style=\"position: fixed; right: 24px; bottom: 24px; z-index: 50; width: 56px; height: 56px; border-radius: 50%; border: 1px solid #00B289; background: radial-gradient(circle, #08503A, #121F2B); color: #00B289; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,.22)\">\n    <svg width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n  <\/button>\n<\/sc-if>\n\n<sc-if value=\"{{fabOpen}}\" hint-placeholder-val=\"{{ false }}\">\n  <button aria-label=\"Close Tessa\" onClick=\"{{closeFab}}\" style=\"position: fixed; inset: 0; z-index: 70; border: 0; background: rgba(0,0,0,.2); cursor: default\"><\/button>\n  <div role=\"dialog\" aria-label=\"Tessa\" class=\"in\" style=\"position: fixed; right: 24px; bottom: 24px; z-index: 71; width: min(420px, calc(100vw - 32px)); height: min(640px, calc(100vh - 48px)); background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; box-shadow: 0 24px 60px rgba(15,23,42,.25); display: flex; flex-direction: column; overflow: hidden; font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif; color: #0F172A\">\n    <div style=\"display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 12px 12px 16px; border-bottom: 1px solid #E2E8F0\">\n      <div style=\"display: flex; align-items: center; gap: 8px; min-width: 0\">\n        <sc-if value=\"{{fabNotHome}}\" hint-placeholder-val=\"{{ false }}\">\n          <button class=\"icon\" aria-label=\"Back\" onClick=\"{{fabHome}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"><\/path><path d=\"M19 12H5\"><\/path><\/svg><\/button>\n        <\/sc-if>\n        <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n        <h2 style=\"margin: 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis\">{{fabTitle}}<\/h2>\n      <\/div>\n      <div style=\"display: flex; align-items: center; gap: 2px\">\n        <sc-if value=\"{{fabIsChat}}\" hint-placeholder-val=\"{{ false }}\">\n          <button class=\"icon\" aria-label=\"New chat\" title=\"New chat\" onClick=\"{{f.newChat}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"><\/path><path d=\"M8 12h8\"><\/path><path d=\"M12 8v8\"><\/path><\/svg><\/button>\n        <\/sc-if>\n        <button class=\"icon\" aria-label=\"Open in full Tessa page\" title=\"Expand\" onClick=\"{{expandFab}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"15 3 21 3 21 9\"><\/polyline><polyline points=\"9 21 3 21 3 15\"><\/polyline><line x1=\"21\" x2=\"14\" y1=\"3\" y2=\"10\"><\/line><line x1=\"3\" x2=\"10\" y1=\"21\" y2=\"14\"><\/line><\/svg><\/button>\n        <sc-if value=\"{{fabNotHistory}}\" hint-placeholder-val=\"{{ true }}\">\n          <button class=\"icon\" aria-label=\"Chat history\" title=\"Chat history\" onClick=\"{{fabHistory}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"><\/path><path d=\"M3 3v5h5\"><\/path><path d=\"M12 7v5l4 2\"><\/path><\/svg><\/button>\n        <\/sc-if>\n        <button class=\"icon\" aria-label=\"Close\" onClick=\"{{closeFab}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button>\n      <\/div>\n    <\/div>\n\n    <sc-if value=\"{{fabIsHome}}\" hint-placeholder-val=\"{{ true }}\">\n      <div style=\"flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 18px\">\n        <div>\n          <h3 style=\"margin: 0; font-size: 19px; font-weight: 600\">How can Tessa help you today?<\/h3>\n          <p style=\"margin: 6px 0 0; font-size: 14px; color: #64748B\">Ask about anything on {{fabPageName}}, or pick a shortcut.<\/p>\n        <\/div>\n        <div style=\"display: flex; flex-direction: column; gap: 8px\">\n          <button class=\"qa\" onClick=\"{{fabSummarize}}\">\n            <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none; margin-top: 2px\"><path d=\"M3 7V5a2 2 0 0 1 2-2h2\"><\/path><path d=\"M17 3h2a2 2 0 0 1 2 2v2\"><\/path><path d=\"M21 17v2a2 2 0 0 1-2 2h-2\"><\/path><path d=\"M7 21H5a2 2 0 0 1-2-2v-2\"><\/path><path d=\"M7 8h8\"><\/path><path d=\"M7 12h10\"><\/path><path d=\"M7 16h6\"><\/path><\/svg>\n            <span style=\"display: flex; flex-direction: column; gap: 2px\"><span style=\"font-weight: 600; font-size: 15px\">Summarize this page<\/span><span style=\"font-size: 13px; color: #64748B\">Get a quick overview of the current content<\/span><\/span>\n          <\/button>\n          <button class=\"qa\" onClick=\"{{fabInsight}}\">\n            <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none; margin-top: 2px\"><polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"><\/polygon><\/svg>\n            <span style=\"display: flex; flex-direction: column; gap: 2px\"><span style=\"font-weight: 600; font-size: 15px\">Quick Insight<\/span><span style=\"font-size: 13px; color: #64748B\">Analyze what you're looking at right now<\/span><\/span>\n          <\/button>\n          <button class=\"qa\" onClick=\"{{fabHistory}}\">\n            <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#00866A\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none; margin-top: 2px\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"><\/path><path d=\"M3 3v5h5\"><\/path><path d=\"M12 7v5l4 2\"><\/path><\/svg>\n            <span style=\"display: flex; flex-direction: column; gap: 2px\"><span style=\"font-weight: 600; font-size: 15px\">Chat History<\/span><span style=\"font-size: 13px; color: #64748B\">Review our previous conversations<\/span><\/span>\n          <\/button>\n        <\/div>\n      <\/div>\n    <\/sc-if>\n\n    <sc-if value=\"{{fabIsChat}}\" hint-placeholder-val=\"{{ false }}\">\n      <div aria-live=\"polite\" data-autoscroll=\"fab\" style=\"flex: 1; overflow-y: auto; padding: 16px\">\n<sc-for list=\"{{f.msgs}}\" as=\"msg\" hint-placeholder-count=\"2\">\n  <sc-if value=\"{{msg.isUser}}\" hint-placeholder-val=\"{{ true }}\">\n    <div class=\"in\" style=\"display: flex; justify-content: flex-end; margin-bottom: 16px\">\n      <div style=\"max-width: 85%; margin-left: 32px; padding: 10px 16px; border-radius: 18px; background: #00866A; color: #fff; font-size: 16px; line-height: 1.5\">\n        <div style=\"white-space: pre-wrap; overflow-wrap: anywhere\">{{msg.text}}<\/div>\n        <sc-if value=\"{{msg.hasMentions}}\" hint-placeholder-val=\"{{ false }}\"><div style=\"margin-top: 4px; font-size: 13px; opacity: .9\">Mentions: {{msg.mentionsText}}<\/div><\/sc-if>\n        <sc-if value=\"{{msg.hasFiles}}\" hint-placeholder-val=\"{{ false }}\">\n          <div style=\"display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px\">\n            <sc-for list=\"{{msg.files}}\" as=\"fl\" hint-placeholder-count=\"1\"><span style=\"display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; background: rgba(255,255,255,.18); font-size: 13px\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"><\/path><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"><\/path><\/svg>{{fl.name}}<\/span><\/sc-for>\n          <\/div>\n        <\/sc-if>\n      <\/div>\n    <\/div>\n  <\/sc-if>\n  <sc-if value=\"{{msg.isAssistant}}\" hint-placeholder-val=\"{{ false }}\">\n    <div class=\"in\" style=\"margin-bottom: 20px; font-size: 16px; line-height: 1.6; color: #0F172A\">\n      <sc-for list=\"{{msg.blocks}}\" as=\"b\" hint-placeholder-count=\"3\">\n        <sc-if value=\"{{b.isH}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0 0 6px; font-weight: 700\">{{b.text}}<\/p><\/sc-if>\n        <sc-if value=\"{{b.isP}}\" hint-placeholder-val=\"{{ true }}\"><p style=\"margin: 0 0 10px\">{{b.text}}<\/p><\/sc-if>\n        <sc-if value=\"{{b.isLi}}\" hint-placeholder-val=\"{{ false }}\"><div style=\"display: flex; gap: 10px; margin: 0 0 6px; padding-left: 4px\"><span aria-hidden=\"true\" style=\"flex: none; width: 6px; height: 6px; margin-top: 10px; border-radius: 50%; background: #00B289\"><\/span><span><strong style=\"font-weight: 600\">{{b.lead}}<\/strong>{{b.text}}<\/span><\/div><\/sc-if>\n      <\/sc-for>\n      <sc-if value=\"{{msg.streaming}}\" hint-placeholder-val=\"{{ false }}\"><span class=\"caret\" aria-hidden=\"true\"><\/span><\/sc-if>\n      <sc-if value=\"{{msg.stopped}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 4px 0 0; font-size: 13px; color: #64748B\">Response stopped.<\/p><\/sc-if>\n    <\/div>\n  <\/sc-if>\n<\/sc-for>\n<sc-if value=\"{{f.thinking}}\" hint-placeholder-val=\"{{ false }}\">\n  <div class=\"in\" style=\"display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 10px 16px; border-radius: 16px; background: #E6F7F2; border: 1px solid #B3E6D8; color: #00664F\">\n    <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 6V2H8\"><\/path><path d=\"m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z\"><\/path><path d=\"M2 12h2\"><\/path><path d=\"M9 11v2\"><\/path><path d=\"M15 11v2\"><\/path><path d=\"M20 12h2\"><\/path><\/svg>\n    <span style=\"font-size: 14px; font-weight: 600\">Tessa is thinking<\/span>\n    <span style=\"display: flex; gap: 3px\"><span class=\"dot\"><\/span><span class=\"dot\" style=\"animation-delay: .2s\"><\/span><span class=\"dot\" style=\"animation-delay: .4s\"><\/span><\/span>\n  <\/div>\n<\/sc-if>\n      <\/div>\n    <\/sc-if>\n\n    <sc-if value=\"{{fabIsHistory}}\" hint-placeholder-val=\"{{ false }}\">\n      <div style=\"flex: 1; overflow-y: auto; padding: 12px 16px\">\n<div style=\"display: flex; flex-direction: column; gap: 2px\">\n  <sc-for list=\"{{history}}\" as=\"h\" hint-placeholder-count=\"6\">\n    <div class=\"hist\">\n      <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" style=\"flex: none; margin-top: 2px; color: #64748B\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"><\/path><\/svg>\n      <button class=\"histopen\" onClick=\"{{h.openF}}\"><span style=\"display: block; font-size: 14px; font-weight: 600\">{{h.title}}<\/span><span style=\"display: block; margin-top: 2px; font-size: 12px; color: #64748B\">{{h.ago}}<\/span><\/button>\n      <button class=\"icon del\" aria-label=\"Delete {{h.title}}\" onClick=\"{{h.remove}}\" style=\"width: 32px; height: 32px\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 6h18\"><\/path><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"><\/path><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"><\/path><\/svg><\/button>\n    <\/div>\n  <\/sc-for>\n  <sc-if value=\"{{noHistory}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0; padding: 12px; font-size: 14px; color: #64748B\">No previous chats.<\/p><\/sc-if>\n<\/div>\n      <\/div>\n    <\/sc-if>\n\n    <sc-if value=\"{{fabNotHistory}}\" hint-placeholder-val=\"{{ true }}\">\n      <div style=\"padding: 0 12px 12px\">\n<div style=\"position: relative\">\n  <sc-if value=\"{{f.mentionOpen}}\" hint-placeholder-val=\"{{ false }}\">\n    <div style=\"position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); z-index: 40; max-height: 320px; overflow-y: auto; padding: 8px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 16px 40px rgba(15,23,42,.16)\">\n      <label for=\"f-mq\" class=\"sr-only\">Search mentions<\/label>\n      <input id=\"f-mq\" class=\"field\" style=\"height: 38px; font-size: 14px\" placeholder=\"Search dashboards, charts, metrics\u2026\" value=\"{{f.mentionQuery}}\" onChange=\"{{f.onMentionQuery}}\" onKeyDown=\"{{f.onMentionKey}}\"/>\n      <sc-for list=\"{{f.mentionGroups}}\" as=\"g\" hint-placeholder-count=\"2\">\n        <div style=\"padding: 10px 10px 4px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #64748B\">{{g.name}}<\/div>\n        <sc-for list=\"{{g.items}}\" as=\"mi\" hint-placeholder-count=\"2\">\n          <button class=\"mitem\" onClick=\"{{mi.pick}}\"><span style=\"font-size: 14px; font-weight: 600\">{{mi.name}}<\/span><span style=\"font-size: 13px; color: #64748B\">{{mi.description}}<\/span><\/button>\n        <\/sc-for>\n      <\/sc-for>\n      <sc-if value=\"{{f.noMentions}}\" hint-placeholder-val=\"{{ false }}\"><p style=\"margin: 0; padding: 12px 10px; font-size: 14px; color: #64748B\">No matches.<\/p><\/sc-if>\n    <\/div>\n  <\/sc-if>\n  <div class=\"composer\" style=\"display: flex; flex-direction: column; gap: 10px; padding: 14px 8px 8px 16px; background: #fff; border: 1px solid #CBD5E1; border-radius: 16px; box-shadow: 0 1px 3px rgba(15,23,42,.06)\">\n    <sc-if value=\"{{f.hasChips}}\" hint-placeholder-val=\"{{ false }}\">\n      <div style=\"display: flex; flex-wrap: wrap; gap: 6px; padding-right: 8px\">\n        <sc-for list=\"{{f.mentionChips}}\" as=\"ch\" hint-placeholder-count=\"1\">\n          <span style=\"display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 4px 0 10px; border-radius: 999px; background: #E6F7F2; color: #00664F; font-size: 13px; font-weight: 600\">@{{ch.name}}<button class=\"chipx\" aria-label=\"Remove {{ch.name}}\" onClick=\"{{ch.remove}}\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button><\/span>\n        <\/sc-for>\n        <sc-for list=\"{{f.fileChips}}\" as=\"fc\" hint-placeholder-count=\"1\">\n          <span style=\"display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 4px 0 10px; border-radius: 6px; background: #F1F5F9; color: #334155; font-size: 13px\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"><\/path><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"><\/path><\/svg>{{fc.name}}<button class=\"chipx\" aria-label=\"Remove {{fc.name}}\" onClick=\"{{fc.remove}}\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"><\/path><path d=\"m6 6 12 12\"><\/path><\/svg><\/button><\/span>\n        <\/sc-for>\n      <\/div>\n    <\/sc-if>\n    <label for=\"f-ta\" class=\"sr-only\">Message Tessa<\/label>\n    <textarea id=\"f-ta\" class=\"ta\" rows=\"2\" placeholder=\"{{f.placeholder}}\" value=\"{{f.input}}\" onChange=\"{{f.onInput}}\" onKeyDown=\"{{f.onKey}}\"><\/textarea>\n    <div style=\"display: flex; align-items: center; justify-content: space-between\">\n      <div style=\"display: flex; align-items: center; gap: 2px\">\n        <button class=\"icon\" title=\"Mention (@)\" aria-label=\"Mention a dashboard, chart or metric\" aria-expanded=\"{{f.mentionAria}}\" onClick=\"{{f.toggleMention}}\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"><\/circle><path d=\"M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8\"><\/path><\/svg><\/button>\n        <label class=\"icon\" title=\"Attach files\" style=\"cursor: pointer\"><input type=\"file\" multiple=\"multiple\" class=\"sr-only\" onChange=\"{{f.onFiles}}\"/><span class=\"sr-only\">Attach files<\/span><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48\"><\/path><\/svg><\/label>\n      <\/div>\n      <sc-if value=\"{{f.busy}}\" hint-placeholder-val=\"{{ false }}\">\n        <button aria-label=\"Stop generating\" onClick=\"{{f.stop}}\" style=\"width: 36px; height: 36px; border: 0; border-radius: 50%; background: #0F172A; color: #fff; display: flex; align-items: center; justify-content: center\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"5\" y=\"5\" rx=\"2\" fill=\"currentColor\"><\/rect><\/svg><\/button>\n      <\/sc-if>\n      <sc-if value=\"{{f.idle}}\" hint-placeholder-val=\"{{ true }}\">\n        <button aria-label=\"Send message\" onClick=\"{{f.send}}\" disabled=\"{{f.sendDisabled}}\" style=\"width: 36px; height: 36px; border: 0; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; background: {{f.sendBg}}; cursor: {{f.sendCursor}}\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12 7-7 7 7\"><\/path><path d=\"M12 19V5\"><\/path><\/svg><\/button>\n      <\/sc-if>\n    <\/div>\n  <\/div>\n<\/div>\n      <\/div>\n    <\/sc-if>\n  <\/div>\n<\/sc-if>\n\n\n<sc-if value=\"{{dialogOpen}}\" hint-placeholder-val=\"{{ false }}\">\n  <button aria-label=\"Close dialog\" onClick=\"{{closeDialog}}\" style=\"position: fixed; inset: 0; z-index: 80; border: 0; background: rgba(15,23,42,.45); cursor: default\"><\/button>\n  <div role=\"dialog\" aria-label=\"{{dialogTitle}}\" class=\"in\" style=\"position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 81; width: min(460px, calc(100vw - 32px)); background: #fff; border-radius: 12px; box-shadow: 0 24px 60px rgba(15,23,42,.3); padding: 24px; display: flex; flex-direction: column; gap: 16px; font-family: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif; color: #0F172A\">\n    <h2 style=\"margin: 0; font-size: 20px; font-weight: 600\">{{dialogTitle}}<\/h2>\n    <sc-if value=\"{{dialogIsAlert}}\" hint-placeholder-val=\"{{ true }}\">\n      <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-name\" style=\"font-size: 14px; font-weight: 600\">Name<\/label><input id=\"d-name\" class=\"field\" placeholder=\"e.g. Low Stock Alert\" value=\"{{form.name}}\" onChange=\"{{form.setName}}\"/><\/div>\n      <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-trigger\" style=\"font-size: 14px; font-weight: 600\">Trigger<\/label><input id=\"d-trigger\" class=\"field\" placeholder=\"e.g. Inventory &lt; 100 units\" value=\"{{form.trigger}}\" onChange=\"{{form.setTrigger}}\"/><\/div>\n      <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-sev\" style=\"font-size: 14px; font-weight: 600\">Severity<\/label>\n        <select id=\"d-sev\" class=\"field\" value=\"{{form.severity}}\" onChange=\"{{form.setSeverity}}\"><option>Critical<\/option><option>High<\/option><option>Medium<\/option><option>Low<\/option><\/select><\/div>\n    <\/sc-if>\n    <sc-if value=\"{{dialogIsUser}}\" hint-placeholder-val=\"{{ false }}\">\n      <div style=\"display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px\">\n        <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-first\" style=\"font-size: 14px; font-weight: 600\">First name<\/label><input id=\"d-first\" class=\"field\" value=\"{{form.firstName}}\" onChange=\"{{form.setFirst}}\"/><\/div>\n        <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-last\" style=\"font-size: 14px; font-weight: 600\">Last name<\/label><input id=\"d-last\" class=\"field\" value=\"{{form.lastName}}\" onChange=\"{{form.setLast}}\"/><\/div>\n      <\/div>\n      <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-email\" style=\"font-size: 14px; font-weight: 600\">Email<\/label><input id=\"d-email\" type=\"email\" class=\"field\" placeholder=\"name@company.com\" value=\"{{form.email}}\" onChange=\"{{form.setEmail}}\"/><\/div>\n      <div style=\"display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px\">\n        <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-plat\" style=\"font-size: 14px; font-weight: 600\">Platform<\/label><select id=\"d-plat\" class=\"field\" value=\"{{form.platform}}\" onChange=\"{{form.setPlatform}}\"><option>GlobalWorx<\/option><option>Acuity<\/option><option>Insights<\/option><\/select><\/div>\n        <div style=\"display: flex; flex-direction: column; gap: 6px\"><label for=\"d-ustatus\" style=\"font-size: 14px; font-weight: 600\">Status<\/label><select id=\"d-ustatus\" class=\"field\" value=\"{{form.status}}\" onChange=\"{{form.setStatus}}\"><option>Active<\/option><option>Inactive<\/option><option>Pending<\/option><\/select><\/div>\n      <\/div>\n    <\/sc-if>\n    <sc-if value=\"{{formError}}\" hint-placeholder-val=\"{{ false }}\">\n      <p style=\"margin: 0; font-size: 14px; color: #B91C1C\">{{formErrorText}}<\/p>\n    <\/sc-if>\n    <div style=\"display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px\">\n      <button class=\"outline\" onClick=\"{{closeDialog}}\">Cancel<\/button>\n      <button class=\"primary\" onClick=\"{{saveDialog}}\">{{dialogCta}}<\/button>\n    <\/div>\n  <\/div>\n<\/sc-if>\n\n<\/div>\n", Component);
+</script>
+</body>
+</html>
